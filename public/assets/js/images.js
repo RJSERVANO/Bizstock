@@ -1,0 +1,18 @@
+(() => {
+ 'use strict';const api=new BizStockApi.ApiClient(),base=document.querySelector('meta[name="app-base-path"]').content;
+ const failure=e=>e.message+(e.requestId?' Reference: '+e.requestId:'');
+ const own=document.querySelectorAll('[data-own-avatar]');
+ function avatars(has){own.forEach(el=>{el.querySelector('img')?.remove();el.classList.toggle('has-photo',has);if(has){const img=document.createElement('img');img.alt='';img.src=`${base}/api/v1/account/photo`;el.append(img);}});}
+ if(own.length)avatars(own[0].dataset.hasImage==='true');
+ document.querySelectorAll('[data-image-editor]').forEach(root=>{
+  const endpoint=root.dataset.imageEditor,form=root.querySelector('form'),image=root.querySelector('[data-image-preview]'),remove=root.querySelector('[data-image-remove]'),message=root.querySelector('[data-image-message]'),selection=root.querySelector('[data-selected-image]'),preview=root.querySelector('[data-selected-preview]'),cancel=root.querySelector('[data-image-cancel]');let has=false,busy=false,previewUrl=null;
+  function clearPreview(){if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=null;preview.removeAttribute('src');selection.hidden=true;form.elements.image.value='';}
+  form.elements.image.addEventListener('change',()=>{if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=null;preview.removeAttribute('src');selection.hidden=true;const file=form.elements.image.files[0];if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>2097152){BizStockUI.showMessage(message,'Choose a JPEG, PNG or WebP image up to 2 MiB. The server verifies its content and dimensions.',true);return;}previewUrl=URL.createObjectURL(file);preview.src=previewUrl;selection.hidden=false;});
+  cancel.addEventListener('click',()=>{if(!busy){clearPreview();BizStockUI.showMessage(message,'Selection cancelled. Your saved image is unchanged.');}});
+  window.addEventListener('pagehide',()=>{if(previewUrl)URL.revokeObjectURL(previewUrl);});
+  function display(value){has=value;image.hidden=!has;root.querySelector('[data-image-placeholder]').hidden=has;remove.disabled=!has;if(has)image.src=`${base}/api/v1${endpoint}`;else image.removeAttribute('src');if(endpoint==='/account/photo')avatars(has);}
+  if(endpoint==='/account/photo')display(own[0]?.dataset.hasImage==='true');else{form.querySelectorAll('input,button').forEach(i=>i.disabled=true);api.request(endpoint.replace(/\/image$/,'')).then(r=>{display(r.data.has_image);form.querySelectorAll('input,button').forEach(i=>i.disabled=false);remove.disabled=!has;}).catch(e=>BizStockUI.showMessage(message,failure(e)+' Reload this page to retry.',true));}
+  async function change(deleting){if(busy)return;busy=true;message.hidden=true;const body=deleting?undefined:new FormData(form);root.setAttribute('aria-busy','true');cancel.disabled=true;form.querySelectorAll('button,input').forEach(b=>b.disabled=true);try{const r=await api.request(endpoint,{method:deleting?'DELETE':'POST',...(!deleting?{body}:{})});display(r.data.has_image);form.reset();clearPreview();BizStockUI.showMessage(message,deleting?'Image removed.':'Image updated.');}catch(e){BizStockUI.showMessage(message,failure(e),true);}finally{busy=false;cancel.disabled=false;root.setAttribute('aria-busy','false');form.querySelectorAll('input').forEach(i=>i.disabled=false);form.querySelector('[type="submit"]').disabled=false;remove.disabled=!has;}}
+  form.addEventListener('submit',event=>{event.preventDefault();change(false);});remove.addEventListener('click',()=>change(true));
+ });
+})();

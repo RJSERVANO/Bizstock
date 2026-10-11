@@ -1,0 +1,10 @@
+CREATE INDEX idx_products_category_active ON products(category_id,is_active,product_id);
+CREATE INDEX idx_products_supplier_active ON products(supplier_id,is_active,product_id);
+CREATE INDEX idx_products_active_name ON products(is_active,product_name,product_id);
+CREATE INDEX idx_transactions_date ON transactions(transaction_date,transaction_id);
+CREATE INDEX idx_transactions_product_date ON transactions(product_id,transaction_date,transaction_id);
+CREATE INDEX idx_transactions_actor_date ON transactions(user_id,transaction_date,transaction_id);
+CREATE INDEX idx_audit_date ON audit_events(occurred_at,event_id);
+CREATE INDEX idx_audit_entity ON audit_events(entity_type,entity_id,event_id);
+CREATE INDEX idx_rate_reset ON rate_limits(reset_at);
+CREATE INDEX idx_users_admin ON users(role,is_active,user_id);

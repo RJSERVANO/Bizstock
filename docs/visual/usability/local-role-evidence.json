@@ -1,0 +1,48 @@
+{
+    "origin": "http:\/\/127.0.0.1:8080",
+    "accounts": [
+        {
+            "username": "dev_admin",
+            "expected_role": "Admin",
+            "exists": true,
+            "active": true,
+            "login_http": 401,
+            "login": "BLOCKED",
+            "reason": "Private initial credential no longer authenticates. Use current chosen password or explicitly authorized recovery."
+        },
+        {
+            "username": "dev_staff",
+            "expected_role": "Staff",
+            "exists": true,
+            "active": true,
+            "login_http": 200,
+            "authenticated_role": "Staff",
+            "must_change_password": true,
+            "login": "PASS",
+            "account_http": 200,
+            "dashboard_api_http": 403,
+            "users_api_http": 403,
+            "public_home_http": 200,
+            "logout_http": 200,
+            "revoked_cookie_api_http": 401
+        },
+        {
+            "username": "dev_viewer",
+            "expected_role": "Viewer",
+            "exists": true,
+            "active": true,
+            "login_http": 200,
+            "authenticated_role": "Viewer",
+            "must_change_password": true,
+            "login": "PASS",
+            "account_http": 200,
+            "dashboard_api_http": 403,
+            "users_api_http": 403,
+            "public_home_http": 200,
+            "logout_http": 200,
+            "revoked_cookie_api_http": 401
+        }
+    ],
+    "passwords_printed": false,
+    "accounts_reset": false
+}

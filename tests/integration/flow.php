@@ -1,0 +1,5 @@
+<?php
+declare(strict_types=1);require __DIR__.'/BusinessFixture.php';use BizStock\Support\StockReconciliation;
+$f=new BusinessFixture('flow');try{
+ $f->browser('tests/browser/flow.cjs');$f->check((int)$f->pdo->query('SELECT COUNT(*) FROM products')->fetchColumn()===1,'one retry-safe product');$p=$f->pdo->query('SELECT * FROM products')->fetch();$f->check($p['quantity']===0&&!$p['is_active'],'final zero-stock archive');$f->check((int)$f->pdo->query('SELECT COUNT(*) FROM transactions')->fetchColumn()===5,'opening and immutable movement count');$f->check((int)$f->pdo->query("SELECT COUNT(*) FROM audit_events WHERE action='product.created'")->fetchColumn()===1,'one creation audit despite lost response');$f->check((int)$f->pdo->query("SELECT COUNT(*) FROM operation_requests WHERE operation_kind='product.create'")->fetchColumn()===1,'one creation reservation');$f->check((new StockReconciliation($f->pdo))->inspect()['discrepancies']===[],'end-to-end stock reconciles');echo 'PASS: '.$f->checks.' complete-flow database assertions.'.PHP_EOL;
+}finally{$f->close();}

@@ -1,0 +1,8 @@
+{
+  "checks": 36,
+  "scans": 15,
+  "screenshots": 15,
+  "empty": "real zero-product database",
+  "faults": "explicit browser delays/503",
+  "availability": "real idempotent opening stock; confirmation not submitted"
+}

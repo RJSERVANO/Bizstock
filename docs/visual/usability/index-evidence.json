@@ -1,0 +1,12 @@
+{
+    "id": 1,
+    "select_type": "SIMPLE",
+    "table": "transactions",
+    "type": "index",
+    "possible_keys": "idx_transactions_date",
+    "key": "idx_transactions_date",
+    "key_len": "12",
+    "ref": null,
+    "rows": "6",
+    "Extra": "Using where; Using index"
+}

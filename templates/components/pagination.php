@@ -1,0 +1,2 @@
+<?php declare(strict_types=1); ?>
+<div class="table-footer"><p data-table-count aria-live="polite">Showing fixture products</p><nav class="pagination-controls" aria-label="Product pages"><button class="bs-button bs-button--secondary" type="button" data-page-prev disabled>Previous</button><span data-page-label aria-live="polite">Page 1</span><button class="bs-button bs-button--secondary" type="button" data-page-next>Next</button></nav></div>

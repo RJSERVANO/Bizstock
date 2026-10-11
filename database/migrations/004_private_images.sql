@@ -1,0 +1,2 @@
+ALTER TABLE users ADD COLUMN profile_image VARCHAR(37) CHARACTER SET ascii COLLATE ascii_bin NULL;
+ALTER TABLE products ADD COLUMN product_image VARCHAR(37) CHARACTER SET ascii COLLATE ascii_bin NULL;

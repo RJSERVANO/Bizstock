@@ -1,0 +1,358 @@
+{
+  "dashboard": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": null
+  },
+  "products": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(255, 255, 255)",
+      "padding": "24px",
+      "display": "grid"
+    }
+  },
+  "products/new": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": null
+  },
+  "movements": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": null
+  },
+  "history": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(255, 255, 255)",
+      "padding": "24px",
+      "display": "grid"
+    }
+  },
+  "reports/inventory": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(255, 255, 255)",
+      "padding": "24px",
+      "display": "grid"
+    }
+  },
+  "reports/transactions": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(255, 255, 255)",
+      "padding": "24px",
+      "display": "grid"
+    }
+  },
+  "categories": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(255, 255, 255)",
+      "padding": "24px",
+      "display": "block"
+    }
+  },
+  "suppliers": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(255, 255, 255)",
+      "padding": "24px",
+      "display": "block"
+    }
+  },
+  "users": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(255, 255, 255)",
+      "padding": "24px",
+      "display": "grid"
+    }
+  },
+  "audit-events": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(255, 255, 255)",
+      "padding": "24px",
+      "display": "grid"
+    }
+  },
+  "account": {
+    "body": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "16px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgb(248, 250, 252)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "heading": {
+      "font": "system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "size": "28px",
+      "color": "rgb(15, 23, 42)",
+      "background": "rgba(0, 0, 0, 0)",
+      "padding": "0px",
+      "display": "block"
+    },
+    "stylesheets": [
+      "http://127.0.0.1:56999/bizstock/assets/vendor/bootstrap.min.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/tokens.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/components.css",
+      "http://127.0.0.1:56999/bizstock/assets/css/layout.css"
+    ],
+    "filter": null
+  }
+}

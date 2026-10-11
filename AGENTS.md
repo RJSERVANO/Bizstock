@@ -1,0 +1,11 @@
+# BizStock repository instructions
+
+- Read docs/progress.md, requirements.md, decisions.md, architecture.md, gaps.md and the requested stage in docs/BizStock-Codex-Build-Blueprint.md before editing. Build only the requested stage; stop after its checks and report.
+- Use the chosen PHP/PDO/MySQL/InnoDB modular monolith, HTML/CSS/vanilla JavaScript and Bootstrap. Only public/ is web-accessible. Keep secrets, tools, logs, backups and source outside it.
+- Controllers translate HTTP, services own business rules/transactions, repositories own prepared SQL, templates own escaped presentation. Reuse one PDO factory, shared configuration, validation, UI tokens/components and browser API client. Do not add parallel implementations.
+- Enforce role permissions and returned fields on the server. No public signup, production mock data, localStorage persistence or secrets in logs/response bodies.
+- Stock writes must use one atomic append-only movement service; no negative stock, duplicate effects, quantity edit bypass or quantity trigger. Preserve historical references, original prices and correction links.
+- Prefer additive tracked migrations; never alter applied migrations silently or reset existing installations. Update schema/validation/services/contracts/UI/tests together when changing behavior. Keep /api/v1 stable or explicitly version changes.
+- Preserve unrelated work. Do not publish, use production credentials, send messages or purchase services without the required user authorization. Do not update Codex memories unless explicitly requested.
+- Run `composer validate --strict`, `composer check` and the checks appropriate to the stage using the selected PHP runtime. Test MySQL 8.4 and explicit local-only MariaDB 10.4.32 separately on real servers; neither substitutes for the other or SQLite. Production rejects the MariaDB local target. Follow docs/database-compatibility.md for portable DDL and case-sensitive role/type tokens. Record commands, actual results and blockers in docs/progress.md; update docs/gaps.md after each stage. Never mark unrun checks passed or release gaps closed merely because a design exists.
+- `.env`, `vendor/`, `.tools/`, downloaded pinned assets and var/ runtime contents are untracked. Install from composer.lock, verify asset checksums and do not weaken runtime/security checks to fit an outdated local stack.

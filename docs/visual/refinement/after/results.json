@@ -1,0 +1,7 @@
+{
+  "phase": "after",
+  "checks": 152,
+  "scans": 111,
+  "screenshots": 133,
+  "states": "empty via actual filters; loading/error via explicit browser fault injection"
+}

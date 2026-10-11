@@ -1,0 +1,2 @@
+<?php
+declare(strict_types=1);require dirname(__DIR__).'/vendor/autoload.php';BizStock\Support\Cli::run(static function()use($argv):int{if(count($argv)!==3)throw new InvalidArgumentException('Usage: backup-database.php /absolute/path/mysqldump private/output.sql');$config=require dirname(__DIR__).'/config/bootstrap.php';$sha=(new BizStock\Support\DatabaseBackup($config))->backup($argv[1],$argv[2]);echo 'Backup completed; SHA-256 '.$sha.PHP_EOL;return 0;});

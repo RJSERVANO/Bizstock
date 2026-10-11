@@ -1,0 +1,73 @@
+{
+  "name": "bizstock/bizstock",
+  "description": "Single-business inventory modular monolith",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": "~8.5.0",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "ext-mbstring": "*",
+    "vlucas/phpdotenv": "^5.6.2",
+    "twbs/bootstrap": "~5.3.8",
+    "ext-gd": "*",
+    "ext-fileinfo": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "BizStock\\": "src/"
+    }
+  },
+  "scripts": {
+    "setup": "@php bin/setup.php",
+    "assets": "@php bin/assets.php",
+    "serve": "@php -d display_errors=0 -S 127.0.0.1:8080 -t public bin/router.php",
+    "lint": "@php bin/lint.php",
+    "test": [
+      "@php tests/foundation.php",
+      "@test:database-policy",
+      "@test:api"
+    ],
+    "test:api": "@php tests/unit/api.php",
+    "test:database-policy": "@php tests/database-policy.php",
+    "test:database": "@php tests/database-compatibility.php",
+    "test:schema": "@php tests/integration/stage4.php",
+    "test:auth": "@php tests/integration/stage6.php",
+    "test:lookups": "@php tests/integration/stage7.php",
+    "test:stock": "@php tests/integration/stage8.php",
+    "migrate": "@php bin/migrate.php",
+    "seed:development": "@php bin/seed-development.php",
+    "reconcile:stock": "@php bin/reconcile-stock.php",
+    "check:runtime": "@php bin/check-runtime.php",
+    "check:database": "@php bin/check-database.php",
+    "check": [
+      "@lint",
+      "@test"
+    ],
+    "test:products": "@php tests/integration/stage9.php",
+    "test:movements": "@php tests/integration/stage10.php",
+    "test:dashboard": "@php tests/integration/stage11.php",
+    "test:reports": "@php tests/integration/stage12.php",
+    "test:flow": "@php tests/integration/flow.php",
+    "test:business": [
+      "@test:stock",
+      "@test:products",
+      "@test:movements",
+      "@test:dashboard",
+      "@test:reports",
+      "@test:flow"
+    ],
+    "test:users": "@php tests/integration/stage13.php",
+    "test:system": "@php tests/integration/stage14.php",
+    "test:backup": "@php tests/integration/stage15.php",
+    "test:install": "@php tests/integration/install.php",
+    "test:images": "@php tests/integration/images.php",
+    "test:homepage": "@php tests/integration/homepage.php",
+    "test:usability": "@php tests/integration/usability.php"
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {},
+    "platform-check": true
+  }
+}

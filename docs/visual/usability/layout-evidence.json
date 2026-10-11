@@ -1,0 +1,146 @@
+[
+  {
+    "width": 360,
+    "display": "grid",
+    "controls": [
+      {
+        "id": "user_id-name-search",
+        "x": 33,
+        "y": 224.390625,
+        "width": 294,
+        "height": 44
+      },
+      {
+        "id": "product_id-name-search",
+        "x": 33,
+        "y": 312.390625,
+        "width": 294,
+        "height": 44
+      },
+      {
+        "id": "category_id",
+        "x": 33,
+        "y": 400.390625,
+        "width": 294,
+        "height": 44
+      },
+      {
+        "id": "type",
+        "x": 33,
+        "y": 488.390625,
+        "width": 294,
+        "height": 44
+      },
+      {
+        "id": "date_from",
+        "x": 33,
+        "y": 576.390625,
+        "width": 294,
+        "height": 44
+      },
+      {
+        "id": "date_to",
+        "x": 33,
+        "y": 691.1875,
+        "width": 294,
+        "height": 44
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "display": "grid",
+    "controls": [
+      {
+        "id": "user_id-name-search",
+        "x": 41,
+        "y": 240.390625,
+        "width": 333,
+        "height": 44
+      },
+      {
+        "id": "product_id-name-search",
+        "x": 394,
+        "y": 240.390625,
+        "width": 333,
+        "height": 44
+      },
+      {
+        "id": "category_id",
+        "x": 41,
+        "y": 328.390625,
+        "width": 333,
+        "height": 44
+      },
+      {
+        "id": "type",
+        "x": 394,
+        "y": 328.390625,
+        "width": 333,
+        "height": 44
+      },
+      {
+        "id": "date_from",
+        "x": 41,
+        "y": 416.390625,
+        "width": 333,
+        "height": 44
+      },
+      {
+        "id": "date_to",
+        "x": 394,
+        "y": 416.390625,
+        "width": 333,
+        "height": 44
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "display": "grid",
+    "controls": [
+      {
+        "id": "user_id-name-search",
+        "x": 297,
+        "y": 251.390625,
+        "width": 351.328125,
+        "height": 44
+      },
+      {
+        "id": "product_id-name-search",
+        "x": 668.328125,
+        "y": 251.390625,
+        "width": 351.328125,
+        "height": 44
+      },
+      {
+        "id": "category_id",
+        "x": 1039.65625,
+        "y": 251.390625,
+        "width": 351.34375,
+        "height": 44
+      },
+      {
+        "id": "type",
+        "x": 297,
+        "y": 339.390625,
+        "width": 351.328125,
+        "height": 44
+      },
+      {
+        "id": "date_from",
+        "x": 668.328125,
+        "y": 339.390625,
+        "width": 351.328125,
+        "height": 44
+      },
+      {
+        "id": "date_to",
+        "x": 1039.65625,
+        "y": 339.390625,
+        "width": 351.34375,
+        "height": 44
+      }
+    ]
+  }
+]

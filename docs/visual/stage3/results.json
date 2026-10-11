@@ -1,0 +1,410 @@
+{
+  "checks": 386,
+  "browser": "155.0.8059.40",
+  "base": "",
+  "screenshots": 70,
+  "ratios": {
+    "primary": 6.701618401398807,
+    "low": 6.367237188363559,
+    "out": 6.802728419777387,
+    "in": 6.4923831516894746
+  },
+  "results": [
+    {
+      "screen": "dashboard",
+      "width": 360,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 360,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 360,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 360,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "gallery",
+      "width": 360,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "viewer",
+      "width": 360,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 360,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 360,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 360,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 360,
+      "state": "restricted",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 360,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 360,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 360,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 360,
+      "state": "restricted",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 360,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 360,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 360,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 360,
+      "state": "restricted",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 360,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 360,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 360,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 360,
+      "state": "restricted",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 768,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 768,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 768,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 768,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "gallery",
+      "width": 768,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "viewer",
+      "width": 768,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 768,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 768,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 768,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 768,
+      "state": "restricted",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 768,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 768,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 768,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 768,
+      "state": "restricted",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 768,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 768,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 768,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 768,
+      "state": "restricted",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 768,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 768,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 768,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 768,
+      "state": "restricted",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 1440,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 1440,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 1440,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 1440,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "gallery",
+      "width": 1440,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "viewer",
+      "width": 1440,
+      "state": "populated",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 1440,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 1440,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 1440,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "dashboard",
+      "width": 1440,
+      "state": "restricted",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 1440,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 1440,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 1440,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "products",
+      "width": 1440,
+      "state": "restricted",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 1440,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 1440,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 1440,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "login",
+      "width": 1440,
+      "state": "restricted",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 1440,
+      "state": "loading",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 1440,
+      "state": "empty",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 1440,
+      "state": "error",
+      "violations": []
+    },
+    {
+      "screen": "form",
+      "width": 1440,
+      "state": "restricted",
+      "violations": []
+    }
+  ]
+}

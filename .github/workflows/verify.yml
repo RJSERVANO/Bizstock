@@ -1,0 +1,42 @@
+name: Isolated release verification
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    # Provision a private disposable runner first; never target production.
+    runs-on: [self-hosted, bizstock-test]
+    env:
+      APP_ENV: test
+      APP_BASE_PATH: /bizstock
+      DB_TARGET: mysql84
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: bizstock_ci
+      DB_USER: ${{ secrets.BIZSTOCK_CI_DB_USER }}
+      DB_PASSWORD: ${{ secrets.BIZSTOCK_CI_DB_PASSWORD }}
+      TEST_DB_ADMIN_USER: ${{ secrets.BIZSTOCK_CI_DB_USER }}
+      TEST_DB_ADMIN_PASSWORD: ${{ secrets.BIZSTOCK_CI_DB_PASSWORD }}
+      TEST_MYSQLDUMP: ${{ vars.BIZSTOCK_CI_MYSQLDUMP }}
+      TEST_MYSQL_CLIENT: ${{ vars.BIZSTOCK_CI_MYSQL_CLIENT }}
+      TEST_COMPOSER: ${{ vars.BIZSTOCK_CI_COMPOSER_PHAR }}
+      COMPOSER_CACHE_DIR: ${{ github.workspace }}/.tools/composer-cache
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer assets
+      - run: npm ci --prefix tests/browser
+      - run: composer validate --strict
+      - run: composer check
+      - run: composer test:schema
+      - run: composer test:auth
+      - run: composer test:lookups
+      - run: composer test:business
+      - run: composer test:users
+      - run: composer test:system
+      - run: composer test:backup
+      - run: composer test:install
+      - run: node tests/openapi.cjs
+      - run: node tests/api-client.cjs
+      - run: node tests/release-docs.cjs
