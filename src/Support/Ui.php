@@ -36,6 +36,8 @@ final readonly class Ui
     public function icon(string $name): string
     {
         $paths = [
+              'warning' => '<path d="m12 3 10 18H2L12 3Z"/><path d="M12 9v5m0 3h.01"/>',
+              'empty-box' => '<path d="M3 8v10l9 5 9-5V8M12 13v10M3 8l9 5 9-5M3 8l4-5m14 5-4-5M9 4h6"/>',
             'dashboard' => '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
             'box' => '<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5 9-5V8M12 13v10"/>',
             'move' => '<path d="M4 7h16m-5-5 5 5-5 5M20 17H4m5-5-5 5 5 5"/>',

@@ -46,11 +46,11 @@
       });
       state(result.data.length ? 'results' : 'empty');
       main.querySelector('[data-pagination]').hidden = !result.data.length;
-      main.querySelector('[data-page-label]').textContent = `Page ${page} of ${pages} · ${result.meta.total} records`;
+      main.querySelector('[data-page-label]').textContent = `Page ${page} of ${pages} · ${result.meta.total} ${result.meta.total===1?'record':'records'}`;
       main.querySelector('[data-previous]').disabled = page <= 1; main.querySelector('[data-next]').disabled = page >= pages;
     } catch (error) { if (current !== generation || error.code === 'ABORTED') return; handleRestricted(error); state('error'); show(message, errorText(error)); }
   }
-  search.addEventListener('submit', event => { event.preventDefault(); if (pending) return; page = 1; message.hidden = true; load(); });
+  search.querySelector('[data-reset-filters]').addEventListener('click',()=>{if(pending)return;search.reset();page=1;load();});search.addEventListener('submit', event => { event.preventDefault(); if (pending) return; page = 1; message.hidden = true; load(); });
   main.querySelector('[data-refresh] button').addEventListener('click', () => { if (!pending) { message.hidden = true; load(); } });
   main.querySelector('[data-previous]').addEventListener('click', () => { if (!pending && page > 1) { page--; load(); } });
   main.querySelector('[data-next]').addEventListener('click', () => { if (!pending && page < pages) { page++; load(); } });

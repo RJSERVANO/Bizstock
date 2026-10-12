@@ -1,0 +1,141 @@
+{
+  "roles": {
+    "Admin": {
+      "authenticated_username": "test1",
+      "selected_hint": "Viewer",
+      "navigation": [
+        "Dashboard",
+        "Products",
+        "Stock movements",
+        "History",
+        "Categories",
+        "Reports",
+        "Suppliers",
+        "Your account",
+        "Users",
+        "Audit log"
+      ],
+      "quick_actions": [
+        "Add product",
+        "Record movement",
+        "View reports"
+      ],
+      "dashboard_fields": [
+        "active_products",
+        "total_units",
+        "low_stock_products",
+        "out_of_stock_products",
+        "low_stock",
+        "snapshot_at",
+        "recent_movements",
+        "activity"
+      ],
+      "product_fields": [
+        "product_id",
+        "sku",
+        "product_name",
+        "location",
+        "description",
+        "category_id",
+        "supplier_id",
+        "price",
+        "quantity",
+        "minimum_threshold",
+        "version",
+        "is_active",
+        "created_at",
+        "updated_at",
+        "category_name",
+        "supplier_name",
+        "stock_status",
+        "has_image"
+      ],
+      "verdict": "PASS"
+    },
+    "Staff": {
+      "authenticated_username": "test2",
+      "selected_hint": "Admin",
+      "navigation": [
+        "Dashboard",
+        "Products",
+        "Stock movements",
+        "History",
+        "Categories",
+        "Reports",
+        "Suppliers",
+        "Your account"
+      ],
+      "quick_actions": [
+        "Record movement",
+        "View reports"
+      ],
+      "dashboard_fields": [
+        "active_products",
+        "total_units",
+        "low_stock_products",
+        "out_of_stock_products",
+        "low_stock",
+        "snapshot_at",
+        "recent_movements",
+        "activity"
+      ],
+      "product_fields": [
+        "product_id",
+        "sku",
+        "product_name",
+        "location",
+        "description",
+        "category_id",
+        "supplier_id",
+        "price",
+        "quantity",
+        "minimum_threshold",
+        "version",
+        "is_active",
+        "created_at",
+        "updated_at",
+        "category_name",
+        "supplier_name",
+        "stock_status",
+        "has_image"
+      ],
+      "verdict": "PASS"
+    },
+    "Viewer": {
+      "authenticated_username": "test5",
+      "selected_hint": "Admin",
+      "navigation": [
+        "Dashboard",
+        "Products",
+        "Categories",
+        "Your account"
+      ],
+      "quick_actions": [
+        "View products"
+      ],
+      "dashboard_fields": [
+        "active_products",
+        "total_units",
+        "low_stock_products",
+        "out_of_stock_products",
+        "low_stock",
+        "snapshot_at"
+      ],
+      "product_fields": [
+        "product_id",
+        "sku",
+        "product_name",
+        "category_id",
+        "quantity",
+        "minimum_threshold",
+        "is_active",
+        "category_name",
+        "stock_status",
+        "has_image"
+      ],
+      "verdict": "PASS"
+    }
+  },
+  "target": "Chrome, real isolated MariaDB API",
+  "assertions": 81
+}

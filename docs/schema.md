@@ -1,5 +1,7 @@
 # BizStock schema — Stage 4
 
+2026-10-12 usability extension requires **no schema change**. Four tracked migrations remain intact. Own profile updates users.full_name/updated_at with safe atomic audit; created_at is displayed as Member since, never as a password-change date. Dashboard uses idx_transactions_date(transaction_date,transaction_id), bounded UTC WHERE ranges and Manila grouping, with exact DECIMAL sums returned as strings. Tiny-fixture EXPLAIN proves index eligibility and chooses a covering index scan for its broad range; it is not a production benchmark. [Actual plan](visual/usability/index-evidence.json). MySQL 8.4 remains pending.
+
 The ten-table schema and three ordered migrations are implemented. **MariaDB 10.4.32 local development is verified; MySQL 8.4 production verification is pending.** [Stage 4 results](stage4-results.json) record actual schema/upgrade/bootstrap/seed/reconciliation assertions. No business HTTP endpoints, authentication or stock service are implemented by this stage.
 
 ## Migration ordering and safety

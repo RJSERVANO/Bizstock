@@ -14,6 +14,8 @@
   sidebar?.querySelectorAll('.nav-link').forEach(link=>{link.addEventListener('focus',()=>link.classList.remove('tooltip-dismissed'));link.addEventListener('pointerleave',()=>link.classList.remove('tooltip-dismissed'));});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.documentElement.classList.contains('sidebar-compact'))sidebar?.querySelectorAll('.nav-link').forEach(link=>link.classList.add('tooltip-dismissed'));});
   const opener = document.querySelector('[data-drawer-open]');
+  if(sidebar){const tip=document.createElement('div');tip.id='navigation-tooltip';tip.className='nav-tooltip';tip.setAttribute('role','tooltip');tip.hidden=true;document.body.append(tip);const hide=()=>{tip.hidden=true;sidebar.querySelectorAll('[aria-describedby="navigation-tooltip"]').forEach(link=>link.removeAttribute('aria-describedby'));};sidebar.querySelectorAll('.nav-link').forEach(link=>{const show=()=>{if(!document.documentElement.classList.contains('sidebar-compact')||innerWidth<=900)return;hide();tip.textContent=link.dataset.tooltip;tip.hidden=false;const r=link.getBoundingClientRect();tip.style.left=(r.right+10)+'px';tip.style.top=Math.max(8,Math.min(innerHeight-tip.offsetHeight-8,r.top))+'px';link.setAttribute('aria-describedby',tip.id);};link.addEventListener('focus',show);link.addEventListener('pointerenter',show);link.addEventListener('blur',hide);link.addEventListener('pointerleave',hide);});sidebar.querySelector('nav').addEventListener('scroll',()=>{hide();const active=document.activeElement;if(active?.matches('#sidebar .nav-link'))active.dispatchEvent(new Event('focus'));});window.addEventListener('resize',hide);toggle?.addEventListener('click',hide);document.addEventListener('keydown',e=>{if(e.key==='Escape')hide();});}
+  document.querySelector('.skip-link')?.addEventListener('click',()=>document.getElementById('main-content')?.focus());
   const workspace = document.getElementById('workspace');
   const backdrop = document.querySelector('[data-drawer-backdrop]');
   function closeDrawer() {
@@ -83,19 +85,19 @@
   });
   const unsavedForm = document.querySelector('[data-unsaved-form]');
   if (unsavedForm) {
-    let dirty = false, pendingUrl = null;
-    unsavedForm.addEventListener('input', () => { dirty = true; });
-    unsavedForm.addEventListener('change', () => { dirty = true; });
-    unsavedForm.addEventListener('bizstock:form-saved', () => { dirty = false; });
-    window.addEventListener('beforeunload', event => { if (dirty) { event.preventDefault(); event.returnValue = ''; } });
+    const snapshot=()=>JSON.stringify([...new FormData(unsavedForm)]);let baseline=snapshot(),pendingLeave=null;
+    const dirty=()=>!unsavedForm.closest('[hidden]')&&snapshot()!==baseline;
+    unsavedForm.addEventListener('bizstock:form-saved', () => { baseline=snapshot(); });
+    window.addEventListener('beforeunload', event => { if (dirty()) { event.preventDefault(); event.returnValue = ''; } });
     const dialog = document.getElementById('unsaved-review');
     const actions = dialog.querySelector('.dialog-actions');
     actions.querySelector('button').textContent = 'Keep editing';
     const leave = document.createElement('button'); leave.type = 'button'; leave.className = 'bs-button bs-button--danger'; leave.textContent = 'Discard changes';
-    leave.addEventListener('click', () => { dirty = false; window.location.assign(pendingUrl); }); actions.append(leave);
+    leave.addEventListener('click', () => { baseline=snapshot();const action=pendingLeave;pendingLeave=null;dialog.close();action?.(); }); actions.append(leave);
+    window.bizstockRequestLeave=(form,action,trigger=document.activeElement)=>{if(form!==unsavedForm||!dirty()){action();return;}pendingLeave=action;openDialog('unsaved-review',trigger);};
     document.addEventListener('click', event => {
       const link = event.target.closest('a[href]');
-      if (dirty && link && !link.getAttribute('href').startsWith('#')) { event.preventDefault(); pendingUrl = link.href; openDialog('unsaved-review', link); }
+      if (dirty() && link && !link.hasAttribute('data-form-return') && !link.getAttribute('href').startsWith('#')) { event.preventDefault();window.bizstockRequestLeave(unsavedForm,()=>{unsavedForm.querySelectorAll('input[type="password"]').forEach(input=>input.value='');window.location.assign(link.href);},link); }
     });
   }
   function showMessage(node, text, isError = false) {
@@ -113,11 +115,11 @@
   document.querySelector('.account-menu')?.addEventListener('keydown',event=>{if(event.key==='Escape'){event.currentTarget.open=false;event.currentTarget.querySelector('summary').focus();}});
   // All existing controls remain in the form; advanced controls use native disclosure.
   document.querySelectorAll('[data-search]').forEach(form=>{
-    const common=new Set(['q','category_id','stock_status','is_active','type','date_from','date_to','entity_type']);
+    form.classList.add('filter-panel');if(form.classList.contains('history-toolbar')||(document.querySelector('main').dataset.screen==='reports'&&form.elements.type))form.classList.add('filter-panel--complex');const common=new Set(['q','category_id','stock_status','is_active','type','date_from','date_to','entity_type']);
     const advanced=document.createElement('details'),summary=document.createElement('summary'),fields=document.createElement('div');
     advanced.className='advanced-filters';summary.textContent='More filters and sorting';fields.className='advanced-fields';advanced.append(summary,fields);
     [...form.querySelectorAll(':scope > .field')].forEach(field=>{const control=field.querySelector('input,select');if(control&&!common.has(control.name))fields.append(field);});
-    if(fields.children.length)form.append(advanced);
+    if(fields.children.length)form.append(advanced);const actions=document.createElement('div');actions.className='filter-actions';[...form.children].filter(el=>el.matches('button,[data-refresh],.filter-actions')||(!el.matches('.field,details')&&el.querySelector('button'))).forEach(el=>actions.append(el));if(!form.querySelector('[data-reset-filters]')&&!actions.querySelector('[data-reset-filters]')){const reset=document.createElement('button');reset.type='button';reset.className='bs-button bs-button--secondary';reset.dataset.resetFilters='';reset.textContent='Reset filters';actions.append(reset);}if(actions.children.length)form.insertBefore(actions,advanced.parentNode?advanced:null);
     const parameters=new URLSearchParams(location.search);
     if([...fields.querySelectorAll('input,select')].some(control=>parameters.has(control.name)))advanced.open=true;
   });
@@ -129,3 +131,4 @@
   });
   window.BizStockUI = Object.freeze({ announce, openDialog, showMessage });
 })();
+

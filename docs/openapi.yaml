@@ -3,7 +3,7 @@
   "info": {
     "title": "BizStock API",
     "version": "1.0.0",
-    "description": "39 operations implemented on local MariaDB through the authorized image extension: authentication, lookups, products, movements/history, dashboard, reports/CSV and Admin accounts/reset/audit and secure private profile/product images. All documented operations implemented. No simulated business success. JSON writes max 65536 bytes; queries 4096 bytes. Incoming request IDs ignored. MySQL 8.4 and production HTTPS verification pending."
+    "description": "39 operations implemented on local MariaDB through the authorized UI/profile extension: authentication, lookups, products, movements/history, dashboard, reports/CSV and Admin accounts/reset/audit and secure private profile/product images. All documented operations implemented. No simulated business success. JSON writes max 65536 bytes; queries 4096 bytes. Incoming request IDs ignored. MySQL 8.4 and production HTTPS verification pending."
   },
   "servers": [
     {
@@ -854,7 +854,7 @@
             "cookieSession": []
           }
         ],
-        "description": "One consistent read snapshot. Active counts exclude archived products: low stock includes equality and zero; out-of-stock counts quantity=0. Admin/Staff activity aggregates all movements (including opening stock, originals, reversals, archived products and inactive actors) over all rows in 7/30 Manila calendar days including today. SQL UTC indexed half-open range, zero-filled daily rows, exact decimal-string totals. Units received/issued are stock activity, never revenue/profit. Viewer does not receive activity or recent movements.",
+        "description": "One consistent read snapshot. Active counts exclude archived products: low stock includes equality and zero; out-of-stock counts quantity=0. Alerts are active-only, ordered quantity ASC then product_id ASC (zero first), API bounded to 100; dashboard initially displays five and links to the full filtered inventory. Total units sums quantities, not inventory value. Admin/Staff activity aggregates all movements (including opening stock, originals, reversals, archived products and inactive actors) over all rows in 7/30 Manila calendar days including today. SQL UTC indexed half-open range, zero-filled daily rows, exact decimal-string totals. Units received/issued are stock activity, never revenue/profit. Viewer does not receive activity or recent movements.",
         "responses": {
           "200": {
             "description": "Implemented against real database accounts and server sessions.",
@@ -4376,7 +4376,23 @@
           "503": {
             "$ref": "#/components/responses/Error503"
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "full",
+                "thumbnail",
+                "card"
+              ],
+              "default": "full"
+            },
+            "description": "Authenticated read-only derivative. Thumbnail max 96px; card max 320px; aspect ratio retained, no upscale, no file mutation. Invalid size 422; mutations reject size."
+          }
+        ]
       },
       "post": {
         "operationId": "profilePhotopost",
@@ -4726,6 +4742,20 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/Id"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "full",
+                "thumbnail",
+                "card"
+              ],
+              "default": "full"
+            },
+            "description": "Authenticated read-only derivative. Thumbnail max 96px; card max 320px; aspect ratio retained, no upscale, no file mutation. Invalid size 422; mutations reject size."
           }
         ]
       },

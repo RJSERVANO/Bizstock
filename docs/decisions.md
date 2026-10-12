@@ -1,5 +1,17 @@
 # BizStock decisions
 
+Dashboard alert ties use stable product IDs after ascending quantity, reusing the product query rather than introducing a separate alert backend. The API's existing 100-row bound remains; initial-five UI links to fully paginated filters. A 30-day chart may scroll horizontally to preserve accessible target size, while tables provide exact quantities. Sidebar scroll is confined to navigation; tooltips live outside the scroll clipping region. Users return is an internal callback through the shared dirty-form guard, with no dependency on browser history. Native browser-menu zoom/manual AT remain explicit unverified checks. [Evidence](dashboard-navigation-review.md).
+
+Latest login design uses a separately generated 3D asset, never a derivative of the homepage art. Login-only CSS scopes the white/reference-inspired layout so other screens retain their shared styling. Mobile hides the illustration; HTML copy/fallback remain independent of image content. Header/footer contain no invented company/contact/legal information. [Origin and checks](login-design.md).
+
+## Usability follow-up (2026-10-12)
+
+Whitelisted role guidance focuses username without clearing credentials; no role is submitted to authentication. Database roles and forced-change flags remain authoritative. Reuse local, disclosed stockroom artwork.
+
+Aggregate the complete ledger in one read snapshot over 7/30 Manila calendar days including today: convert midnight boundaries to UTC and group at +08:00, zero-fill days, retain exact SQL decimal-string totals. Opening stock, reversals, archived products and inactive actors contribute to activity; live counts include active products only. Chart ratios are decorative; the accessible table/totals retain exact values. Viewer never receives activity; period queries are forbidden.
+
+Own profile updates full_name only under the current-user lock and commits with safe audit. Name changes do not rotate credentials or revoke sessions. Forms have independent busy/messages. API clients share an in-memory cache generation so password rotation invalidates all CSRF caches, with no automatic write retry. Explicit img-src self/blob permits only local unsaved previews; revoke object URLs on cancel/save/exit. Server upload validation/re-encoding remains authoritative. No new migration/dependency.
+
 ## Public homepage decisions (2026-10-12)
 
 Keep illustrative public presentation separate from database-backed application screens. Original generated stockroom art is local, optimized and disclosed as fictional; no external stock assets or private uploads are used. Anonymous homepage never contacts the DB, while existing signed-in sessions are checked for a CTA only. Central public identity/contact settings have bounded validation/escaping and no invented default email. Reuse role cards and one secure login form; the server-authenticated account and returned forced-change flag determine subsequent access. Reuse shared navigation layout with one icon track rather than per-page offsets; no migration or auth/stock policy changes. [Provenance](asset-licenses.md) and [verification](public-homepage.md).

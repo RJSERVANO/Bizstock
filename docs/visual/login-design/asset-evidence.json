@@ -1,0 +1,24 @@
+{
+  "original": "0fd230619f26ffa5dcb4087e43202092599420712f94fbcf2b1b9a830a0b33c8",
+  "generated_source": "exec-b130248d-927f-4f97-bc95-df961992dc85.png",
+  "method": "built-in imagegen",
+  "sizes": [
+    {
+      "path": "public/assets/images/login-inventory-480.webp",
+      "bytes": 13784,
+      "sha256": "249e1ffd50ef0154689681af88eccee2a2ae50e61abf892ed6fa1b57419820ba"
+    },
+    {
+      "path": "public/assets/images/login-inventory-960.webp",
+      "bytes": 32476,
+      "sha256": "0b10ee98d4244b3b7bd88d5e64028ad62e4021e5caf9536328d9215600514486"
+    },
+    {
+      "path": "public/assets/images/login-inventory-1280.webp",
+      "bytes": 45810,
+      "sha256": "68013792352610d20e860f7e82d46b29ec7a18cdf636b8ac60a7fc9e2d1bbaa5"
+    }
+  ],
+  "homepage_preserved": true,
+  "other_screens_preserved": true
+}

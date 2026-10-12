@@ -1,0 +1,870 @@
+[
+  {
+    "route": "dashboard",
+    "width": 360,
+    "rail": false,
+    "h1x": 67.453125,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44
+    ]
+  },
+  {
+    "route": "products",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "products/new",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "products/1/edit",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "movements",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "history",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "categories",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44,
+      44,
+      0
+    ]
+  },
+  {
+    "route": "suppliers",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44,
+      44,
+      0,
+      0
+    ]
+  },
+  {
+    "route": "reports/inventory",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "reports/transactions",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "account",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "users",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 0,
+    "controlHeights": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "route": "audit-events",
+    "width": 360,
+    "rail": false,
+    "h1x": 16,
+    "h1y": 85,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "16px",
+    "panelx": 16,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "dashboard",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44
+    ]
+  },
+  {
+    "route": "products",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "products/new",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "products/1/edit",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "movements",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "history",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "categories",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44,
+      44,
+      0
+    ]
+  },
+  {
+    "route": "suppliers",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44,
+      44,
+      0,
+      0
+    ]
+  },
+  {
+    "route": "reports/inventory",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "reports/transactions",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "account",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "users",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 0,
+    "controlHeights": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "route": "audit-events",
+    "width": 768,
+    "rail": false,
+    "h1x": 24,
+    "h1y": 101,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "24px",
+    "panelx": 24,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "dashboard",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44
+    ]
+  },
+  {
+    "route": "dashboard",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44
+    ]
+  },
+  {
+    "route": "products",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "products",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "products/new",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "products/new",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "products/1/edit",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "products/1/edit",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "movements",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "movements",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "history",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "history",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "categories",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44,
+      44,
+      0
+    ]
+  },
+  {
+    "route": "categories",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44,
+      44,
+      0
+    ]
+  },
+  {
+    "route": "suppliers",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44,
+      44,
+      0,
+      0
+    ]
+  },
+  {
+    "route": "suppliers",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44,
+      44,
+      0,
+      0
+    ]
+  },
+  {
+    "route": "reports/inventory",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "reports/inventory",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "reports/transactions",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "reports/transactions",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "account",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "account",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "users",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 0,
+    "controlHeights": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "route": "users",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 0,
+    "controlHeights": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "route": "audit-events",
+    "width": 1440,
+    "rail": false,
+    "h1x": 280,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 280,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  },
+  {
+    "route": "audit-events",
+    "width": 1440,
+    "rail": true,
+    "h1x": 112,
+    "h1y": 112,
+    "font": "30px",
+    "weight": "700",
+    "gutter": "32px",
+    "panelx": 112,
+    "controlHeights": [
+      44,
+      44,
+      44,
+      44
+    ]
+  }
+]

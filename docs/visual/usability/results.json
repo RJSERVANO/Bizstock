@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-12",
+  "target": "MariaDB 10.4.32 local development",
+  "installed_connection": {
+    "port": 13307,
+    "status": "BLOCKED",
+    "reason": "Aria journal checkpoint beyond last log page; mysql.plugin startup failure",
+    "reconciliation_before": {
+      "products_checked": 3,
+      "discrepancies": []
+    },
+    "reconciliation_after": "BLOCKED: unavailable connection",
+    "recovery_performed": false
+  },
+  "isolated_connection": {
+    "port": 13308,
+    "version": "10.4.32-MariaDB",
+    "scope": "fresh disposable runtime; same installed XAMPP binary",
+    "installed_config_repointed": false,
+    "shutdown_after_tests": "PASS"
+  },
+  "checks": {
+    "usability": {
+      "database_http": 90,
+      "chrome": 99,
+      "axe": 20
+    },
+    "permissions": {
+      "database_http": 145,
+      "chrome": 81,
+      "axe": 9
+    },
+    "auth": {
+      "database_security": 336,
+      "chrome": 32,
+      "axe": 7
+    },
+    "images": {
+      "database_http": 54,
+      "chrome": 50,
+      "axe": 18
+    },
+    "movements": {
+      "database": 4,
+      "chrome": 28
+    },
+    "dashboard": {
+      "database": 13,
+      "chrome": 16
+    },
+    "users": {
+      "database_api": 37,
+      "chrome": 21,
+      "axe": 7
+    },
+    "composer": {
+      "validate_strict": "PASS",
+      "php_syntax": 133,
+      "foundation": 139,
+      "engine_policy": 14,
+      "api": 64
+    },
+    "openapi": {
+      "operations": 39,
+      "references": 671
+    },
+    "api_client": "PASS"
+  },
+  "screenshots": {
+    "before": 15,
+    "after": 31
+  },
+  "preservation": {
+    "initial_credential_file": "PASS: unchanged hash",
+    "installed_uploads": "PASS: two unchanged hashes",
+    "applied_migration_files": "PASS: four unchanged checksums",
+    "installed_database_rows": "BLOCKED: unavailable final connection",
+    "passwords_printed": false,
+    "accounts_reset": false,
+    "rate_limits": "Unchanged policy; normal authorized sign-in counters retained"
+  },
+  "pending": [
+    "MySQL 8.4",
+    "production HTTPS",
+    "hosted image storage/backup",
+    "actual participants/manual AT",
+    "hosted CI"
+  ],
+  "deployment_performed": false
+}

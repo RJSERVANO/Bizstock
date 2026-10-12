@@ -25,5 +25,6 @@ const response=(status,payload,type='application/json')=>({status,ok:status>=200
  const limited=response(429,{error:{code:'RATE_LIMITED',message:'Wait.'}}); const originalGet=limited.headers.get;
  limited.headers.get=key=>key==='Retry-After'?'300':originalGet(key);queue.push(limited);
  await assert.rejects(client.request('/health'),e=>e.code==='RATE_LIMITED'&&e.retryAfter===300);
+ const sibling=new ApiClient('/bizstock');queue.push(response(200,{data:{csrf_token:'before-rotation'},meta:{}}));assert.equal(await sibling.csrfToken(),'before-rotation');client.clearSession();queue.push(response(200,{data:{csrf_token:'after-rotation'},meta:{}}),response(200,{data:{full_name:'Saved'},meta:{}}));await sibling.request('/account/profile',{method:'PATCH',body:{full_name:'Saved'}});assert.equal(calls.at(-1).options.headers['X-CSRF-Token'],'after-rotation');
  console.log('PASS: browser API client transport, CSRF, expiry, replay-key, CSV and failure checks.');
 })().catch(error=>{console.error(error);process.exit(1);});

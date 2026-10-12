@@ -1,0 +1,557 @@
+{
+    "target": "MariaDB 10.4.32, isolated actual HTTP accounts, APP_BASE_PATH=\/bizstock",
+    "roles": {
+        "Admin": {
+            "username": "test1",
+            "authenticated_role": "Admin",
+            "screens": {
+                "\/": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/login": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/account": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/dashboard": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/products": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/categories": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/suppliers": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/movements": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/history": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/inventory": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/transactions": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/users": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/audit-events": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/products\/new": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/products\/3\/edit": {
+                    "http": 200,
+                    "verdict": "PASS"
+                }
+            },
+            "api": {
+                "\/dashboard": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/products": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/products\/3": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/categories": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/suppliers": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/transactions": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/inventory": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/transactions": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/inventory?format=csv": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/transactions?format=csv": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/users": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/audit-events": {
+                    "http": 200,
+                    "verdict": "PASS"
+                }
+            },
+            "mutations": [],
+            "dashboard_fields": [
+                "active_products",
+                "total_units",
+                "low_stock_products",
+                "out_of_stock_products",
+                "low_stock",
+                "snapshot_at",
+                "recent_movements",
+                "activity"
+            ],
+            "product_fields": [
+                "product_id",
+                "sku",
+                "product_name",
+                "location",
+                "description",
+                "category_id",
+                "supplier_id",
+                "price",
+                "quantity",
+                "minimum_threshold",
+                "version",
+                "is_active",
+                "created_at",
+                "updated_at",
+                "category_name",
+                "supplier_name",
+                "stock_status",
+                "has_image"
+            ],
+            "verdict": "PASS"
+        },
+        "Staff": {
+            "username": "test2",
+            "authenticated_role": "Staff",
+            "screens": {
+                "\/": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/login": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/account": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/dashboard": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/products": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/categories": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/suppliers": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/movements": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/history": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/inventory": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/transactions": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/users": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/audit-events": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/products\/new": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/products\/3\/edit": {
+                    "http": 403,
+                    "verdict": "PASS"
+                }
+            },
+            "api": {
+                "\/dashboard": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/products": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/products\/3": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/categories": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/suppliers": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/transactions": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/inventory": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/transactions": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/inventory?format=csv": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/reports\/transactions?format=csv": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/users": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/audit-events": {
+                    "http": 403,
+                    "verdict": "PASS"
+                }
+            },
+            "mutations": {
+                "POST \/products": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "PATCH \/products\/3": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "DELETE \/products\/3": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "POST \/categories": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "PATCH \/categories\/1": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "DELETE \/categories\/1": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "POST \/suppliers": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "PATCH \/suppliers\/1": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "DELETE \/suppliers\/1": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "POST \/users": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "PATCH \/users\/4": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "DELETE \/users\/4": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "POST \/users\/4\/password-reset": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "POST \/transactions": {
+                    "http": 403,
+                    "verdict": "PASS"
+                }
+            },
+            "dashboard_fields": [
+                "active_products",
+                "total_units",
+                "low_stock_products",
+                "out_of_stock_products",
+                "low_stock",
+                "snapshot_at",
+                "recent_movements",
+                "activity"
+            ],
+            "product_fields": [
+                "product_id",
+                "sku",
+                "product_name",
+                "location",
+                "description",
+                "category_id",
+                "supplier_id",
+                "price",
+                "quantity",
+                "minimum_threshold",
+                "version",
+                "is_active",
+                "created_at",
+                "updated_at",
+                "category_name",
+                "supplier_name",
+                "stock_status",
+                "has_image"
+            ],
+            "verdict": "PASS"
+        },
+        "Viewer": {
+            "username": "test5",
+            "authenticated_role": "Viewer",
+            "screens": {
+                "\/": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/login": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/account": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/dashboard": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/products": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/categories": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/suppliers": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/movements": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/history": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/reports\/inventory": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/reports\/transactions": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/users": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/audit-events": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/products\/new": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/products\/3\/edit": {
+                    "http": 403,
+                    "verdict": "PASS"
+                }
+            },
+            "api": {
+                "\/dashboard": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/products": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/products\/3": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/categories": {
+                    "http": 200,
+                    "verdict": "PASS"
+                },
+                "\/suppliers": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/transactions": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/reports\/inventory": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/reports\/transactions": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/reports\/inventory?format=csv": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/reports\/transactions?format=csv": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/users": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "\/audit-events": {
+                    "http": 403,
+                    "verdict": "PASS"
+                }
+            },
+            "mutations": {
+                "POST \/products": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "PATCH \/products\/3": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "DELETE \/products\/3": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "POST \/categories": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "PATCH \/categories\/1": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "DELETE \/categories\/1": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "POST \/suppliers": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "PATCH \/suppliers\/1": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "DELETE \/suppliers\/1": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "POST \/users": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "PATCH \/users\/4": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "DELETE \/users\/4": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "POST \/users\/4\/password-reset": {
+                    "http": 403,
+                    "verdict": "PASS"
+                },
+                "POST \/transactions": {
+                    "http": 403,
+                    "verdict": "PASS"
+                }
+            },
+            "dashboard_fields": [
+                "active_products",
+                "total_units",
+                "low_stock_products",
+                "out_of_stock_products",
+                "low_stock",
+                "snapshot_at"
+            ],
+            "product_fields": [
+                "product_id",
+                "sku",
+                "product_name",
+                "category_id",
+                "quantity",
+                "minimum_threshold",
+                "is_active",
+                "category_name",
+                "stock_status",
+                "has_image"
+            ],
+            "verdict": "PASS"
+        }
+    },
+    "reconciliation_before": "PASS",
+    "forced_lookup_pages": "PASS: categories\/suppliers redirect to required account change",
+    "reconciliation_after": "PASS",
+    "assertions": 145
+}

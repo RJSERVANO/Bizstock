@@ -14,11 +14,16 @@ final readonly class ImageService
         if(!preg_match('/^[a-f0-9]{32}\.webp$/D',$name)){throw new \RuntimeException('Invalid stored image reference.');}
         return $this->directory().'/'.$name;
     }
-    public function read(bool $product,int $id): string {
+    public function read(bool $product,int $id,string $size='full'): string {
         $name=(new ImageRepository($this->pdo))->find($product,$id)['filename']??null;
         if(!$name || !is_file($this->path($name)) || is_link($this->path($name))){throw new HttpException(404,'IMAGE_NOT_FOUND','No image is available.');}
         $bytes=@file_get_contents($this->path($name));
-        if($bytes===false){throw new HttpException(404,'IMAGE_NOT_FOUND','No image is available.');}return $bytes;
+        if($bytes===false){throw new HttpException(404,'IMAGE_NOT_FOUND','No image is available.');}
+        if($size==='full')return $bytes;
+        $limit=match($size){'thumbnail'=>96,'card'=>320,default=>throw new HttpException(422,'VALIDATION_ERROR','Choose a valid image size.')};
+        $image=@imagecreatefromstring($bytes);if(!$image)throw new HttpException(404,'IMAGE_NOT_FOUND','No image is available.');
+        $ratio=min(1,$limit/max(imagesx($image),imagesy($image)));$output=imagecreatetruecolor(max(1,(int)round(imagesx($image)*$ratio)),max(1,(int)round(imagesy($image)*$ratio)));imagealphablending($output,false);imagesavealpha($output,true);imagecopyresampled($output,$image,0,0,0,0,imagesx($output),imagesy($output),imagesx($image),imagesy($image));
+        ob_start();try{if(!imagewebp($output,null,80))throw new \RuntimeException('Image encoding failed.');return ob_get_contents();}finally{ob_end_clean();unset($image,$output);}
     }
     public function encode(array $file,bool $product): string {
         if(!extension_loaded('gd')||!extension_loaded('fileinfo')||!(gd_info()['WebP Support']??false)){throw new HttpException(503,'IMAGE_SUPPORT_UNAVAILABLE','Image processing is unavailable.');}

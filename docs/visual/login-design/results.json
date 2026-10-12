@@ -1,0 +1,17 @@
+{
+  "chrome_assertions": 49,
+  "axe_scans": 10,
+  "roles": "actual isolated MariaDB Admin/Staff/Viewer, conflicting guidance hints",
+  "states": [
+    "normal",
+    "required validation",
+    "controlled 401",
+    "held request/503",
+    "image failure"
+  ],
+  "widths": [
+    360,
+    768,
+    1440
+  ]
+}

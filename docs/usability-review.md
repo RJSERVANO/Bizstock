@@ -1,0 +1,60 @@
+# BizStock usability and permission review — 2026-10-12
+
+Implemented the pasted request, including the additional account-profile section, and the explicit three-role verification follow-up. No deployment, migration 005, account reset or change to stock rules.
+
+## Changes and root causes
+
+- Login is a responsive split layout using the existing optimized/disclosed local stockroom illustration, with teal fallback, form-first mobile order, Back to home and shared password visibility controls. Admin/Staff/Viewer guidance buttons announce selection and focus username without clearing either credential. Homepage links pass a strictly allowlisted `role` hint. Previously every role link pointed to the same `/login#auth-title`, so it had no selection behavior. Hints are never submitted to login, and the database account/forced-change flag determines access.
+- History uses a responsive three/two/one-column grid with common name/category/type/date controls, native dates, retained advanced IDs/sort/order, separate Search/Reset filters/Refresh actions and page-one reset. Previously bottom-aligned flex items with differing hints/labels placed controls on different baselines; a more-specific shared selector also overrode the first grid attempt. Actual computed grid/control-position regressions now guard alignment. Numeric/currency alignment, IN/OUT badges, wrapping product/actor cells and real linked correction details retain immutable history and Admin-only reversal.
+- Movement forms use the available content width with padded entry/notes sections and a stock panel. Typing a new search explicitly clears selection and stale availability; loading/failed searches clear obsolete options. Search alone never chooses a product. Availability failures can retry the retained selector; review includes actual product name/SKU/type/quantity/stock. Atomic writers, captured prices, reasons, reversal links and retained idempotency keys are unchanged.
+- Dashboard adds active zero-stock count/filter, role-specific quick actions, 7/30-day daily units IN/OUT and exact period totals from the complete database ledger. Opening stock and reversals count as activity; archived products/inactive actors remain in historical activity. Live counts exclude archived products; low stock includes equality and zero. One read snapshot supplies counts/alerts/history/activity. UTC half-open boundaries represent Manila calendar days including today. Existing date index suffices; the tiny-fixture covering-index EXPLAIN is eligibility evidence, not a performance benchmark. Accessible daily data and textual totals accompany decorative bars; no revenue/profit claim. Viewer never queries or receives activity/recent movements.
+- Account has separate overview, personal-details, photo and compact security sections. Own display-name PATCH validates a trimmed nonblank maximum 100-character name, locks/rereads the current account and commits safe audit with the update. Username/role/status remain read-only; Member since uses recorded created_at. Name/header/default initials update immediately and persist. Photo preview/cancel retains the old image until the existing secure upload succeeds; failure keeps it intact. Password verification, CSRF, forced change and session revocation remain. Independent API clients now invalidate cached CSRF tokens together after password rotation; regression saves details/uploads again after rotation. No unimplemented sign-out-other-sessions control was added.
+
+Shared fields/components/styles/client/services are used; all page, API, image and artwork paths support APP_BASE_PATH. The CSP retains self-only defaults with an image-only blob allowance for local unsaved previews. Metadata stripping, private file serving, dimensions/content validation and generated filenames remain server-enforced.
+
+## Permission matrix: actual isolated MariaDB and Chrome tests
+
+These verdicts use newly executed HTTP requests and real rendered pages for `test1`/Admin, `test2`/Staff and `test5`/Viewer in disposable databases on MariaDB 10.4.32. They are not inferred from documentation or hidden controls. Login deliberately uses a conflicting role hint to prove the database account remains authoritative. PASS means permitted access succeeds **and** forbidden access is denied.
+
+| Area | Admin | Staff | Viewer | Actual evidence |
+|---|---|---|---|---|
+| Authenticated role overrides selected guidance | PASS | PASS | PASS | /auth/me, mismatched role-hint browser login |
+| Navigation matches account permissions | PASS | PASS | PASS | Exact rendered link sets; direct page requests |
+| Four availability cards and active/equality/zero counts | PASS | PASS | PASS | Actual dashboard JSON/DOM; independent SQL and inventory filter parity |
+| Chart, totals, recent history and quick actions | PASS | PASS | PASS: activity/recent fields and controls omitted; period query 403 | Response key lists, actual DOM/actions; bounded 7/30-day daily SQL checks |
+| Product/table/cards prices and supplier fields | PASS: returned | PASS: returned | PASS: omitted in list/detail/nested alerts/cards/table; sensitive queries 403 | Positive Viewer field allowlist plus actual rendered table/cards |
+| Products/categories/suppliers management | PASS | PASS: direct POST/PATCH/DELETE denied 403; no edit/archive/create controls | PASS: denied 403; category availability read only, suppliers denied | Real mutations and direct product create/edit URLs |
+| Ordinary stock IN/OUT | PASS | PASS: real 201 writes | PASS: direct write/page denied 403 | Existing stock suite and dedicated HTTP permissions test |
+| Reversal | PASS: actual reversal 201 | PASS: direct reversal 403; no Reverse link/mode | PASS: history/movement direct requests denied | Actual ledger reversal and server policy tests |
+| History, reports and CSV | PASS | PASS | PASS: pages/APIs/CSV denied 403; no movement/report response data | Direct HTML, JSON and CSV requests |
+| User administration and audit | PASS | PASS: pages/APIs/create/edit/deactivate/reset denied 403 | PASS: same denials | Direct URLs and valid-CSRF mutations |
+| Own profile/photo/password | PASS | PASS | PASS | All-role profile saves, secure image/auth regressions, forced-change denial |
+
+Machine-readable [API/status matrix](visual/usability/permissions-api.json) and [browser/field/action matrix](visual/usability/permissions-browser.json) contain actual statuses and field names, no passwords/cookies. Dedicated suite: **145 MariaDB/HTTP assertions, 81 Chrome assertions, nine clean WCAG axe scans**. There are no remaining confirmed local permission failures in this suite.
+
+## Installed accounts and current runtime blockers
+
+Confirmed shared [homepage](http://127.0.0.1:8080/) and [login](http://127.0.0.1:8080/login) return HTTP 200. Installed usernames were verified as active: `dev_admin`, `dev_staff`, `dev_viewer`. Initial credentials are stored privately in ignored `var/development-credentials.json`, outside public/. That file records initial passwords, not a changed password; never publish it or autofill it into the public UI.
+
+One actual initial-credential login attempt per installed role was made while the original connection was available:
+
+| Installed account | Initial login | Forced-change/logout evidence | Unrestricted installed screen verification |
+|---|---|---|---|
+| dev_admin / Admin | BLOCKED: HTTP 401; stored initial password no longer authenticates | BLOCKED; no password guess/reset/retry | BLOCKED: current password needed |
+| dev_staff / Staff | PASS: HTTP 200 and role Staff | PASS: required change flag, Account 200, protected dashboard 403, logout 200 and revoked cookie 401 | BLOCKED until the user completes required password change |
+| dev_viewer / Viewer | PASS: HTTP 200 and role Viewer | PASS: same required-change/protected/logout checks | BLOCKED until required password change |
+
+[Recorded installed-role results](visual/usability/local-role-evidence.json) contain no credential values. A changed password must be supplied by its owner, or an existing Admin can use Users → Reset password and deliver a temporary credential privately. If every Admin is locked out, a trusted operator can follow [authorized emergency recovery](admin-management.md). This task performed no recovery/reset and did not clear forced flags.
+
+The original loopback MariaDB instance at **13307 is currently BLOCKED**: after the runtime interruption, startup reports `Aria engine: log data error`, a checkpoint beyond the journal's last page, failure to initialize Aria and inability to open mysql.plugin. A normal restart also failed outside the sandbox. No original data directory was removed/reinitialized/repaired and no grants were bypassed. Repairing this installed system-table/journal problem requires a separate backed-up recovery operation before private app screens and final installed row/reconciliation checks can run again.
+
+Independent checks were completed on a **fresh isolated 10.4.32 instance at port 13308**, initialized in a new ignored test directory using the same installed XAMPP binary, private random test credentials and loopback binding. Existing `.env`, installed credential file, inventory directory and uploaded files were not repointed to it. Each acceptance fixture creates/drops only its own random database. The temporary port-13308 instance was shut down after verification. This is local MariaDB evidence, not MySQL or installed-account recovery evidence.
+
+## Verification, preservation and screenshots
+
+- New usability acceptance: **90 MariaDB/HTTP assertions, 99 Chrome assertions, 20 clean WCAG axe scans**. Includes name/audit rollback, tamper/other-target/CSRF/forced denial, all-role persistence, previews/cancel/rejection/default avatars, password rotation across clients, actual movement submission, recoverable availability, grid baselines, direct role hints, 30-day responsive chart and authoritative SQL boundary comparisons.
+- Actual pages reviewed at 360/768/1440, including expanded/compact desktop navigation, mobile modal drawer/Escape return focus, default/photo/profile states, chart/table alternative and reduced motion. [Before/after gallery](visual/usability/index.html), [computed layout](visual/usability/layout-evidence.json) and [index plan](visual/usability/index-evidence.json). Captures use explicitly disposable test records, not installed accounts or uploaded photos; before/after datasets differ because the acceptance fixture exercises boundary/correction cases. Screenshots are evidence of rendered states, not invented customer statistics.
+- Baseline installed reconciliation before testing: three products, zero discrepancies. Isolated usability and permission reconciliation before/after: PASS. Installed final row hash/reconciliation: **BLOCKED by the unavailable original server**, not claimed passed. Private initial-credential file hash and both installed upload file hashes remain unchanged; all four applied migration file checksums match the baseline. Installed login attempts intentionally wrote normal rate-limit counters; they were never cleared or weakened.
+- Earlier in this task, complete inventory regression passed: 159 DB/harness and 117 Chrome assertions, including concurrency, rollback, safe retries, reversals, opening stock, reports/CSV and complete creation-to-export flow. Authentication: 336 DB/security and 32 Chrome/seven axe; images: 54 DB/HTTP and 50 Chrome/18 axe; homepage: 28 DB/HTTP and 68 Chrome/18 axe; user management: 37 DB/API and 21 Chrome/seven axe. Shared UI: 152 assertions/111 axe plus 36 supplemental assertions/15 axe on real empty/loading/error/availability states. These were actual successful runs before the installed runtime became unavailable; final affected reruns use the isolated instance.
+
+MySQL 8.4, production HTTPS, hosted image storage/GD/ACL/coordinated restore, actual participant/manual assistive-technology testing and hosted CI remain **pending / NOT VERIFIED**. No deployment or service purchase. Final affected-run totals are recorded in [progress](progress.md).

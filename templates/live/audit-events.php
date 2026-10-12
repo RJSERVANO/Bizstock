@@ -1,4 +1,4 @@
-<?php declare(strict_types=1); ?><p>A permanent record of changes made by your team.</p><form data-search class="panel compact-toolbar">
+<?php declare(strict_types=1); ?><form data-search class="panel compact-toolbar">
 <?php foreach(['entity_type'=>'Entity type','entity_id'=>'Entity ID','actor_id'=>'Actor ID','date_from'=>'From date (Asia/Manila)','date_to'=>'Through date (Asia/Manila)'] as $key=>$label): ?><?= $ui->component('field',['id'=>$key,'label'=>$label]) ?><?php endforeach; ?>
 <?= $ui->component('field',['id'=>'sort','label'=>'Sort by','type'=>'select','options'=>['occurred_at'=>'Date','event_id'=>'ID']]) ?><?= $ui->component('field',['id'=>'direction','label'=>'Order','type'=>'select','options'=>['desc'=>'Newest','asc'=>'Oldest']]) ?><div><button class="bs-button bs-button--primary" type="submit">Search</button> <button class="bs-button bs-button--secondary" data-refresh type="button">Refresh</button></div></form>
 <?php $columns=['audit_id'=>'ID','audit_date'=>'Date (Manila)','audit_actor'=>'Actor','audit_action'=>'Action','audit_entity'=>'Entity','audit_details'=>'Details'];require $config->root.'/templates/components/live-results.php'; ?>

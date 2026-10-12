@@ -10,9 +10,9 @@
 <script src="<?= Ui::escape($ui->asset('js/pages/auth.js')) ?>" defer></script>
 </head><body class="<?= $screen==='login'?'auth-public':'' ?>">
 <a class="skip-link" href="#main-content">Skip to main content</a>
+<?php if($screen==='login'): ?><header class="login-header"><div><a class="brand" href="<?= Ui::escape($config->url('/')) ?>"><span class="brand-mark"><?= $ui->icon('box') ?></span>BizStock</a><a href="<?= Ui::escape($config->url('/')) ?>">Back to home</a></div></header><?php endif; ?>
 <main id="main-content" class="login-page" tabindex="-1"><div class="login-wrap">
-<a class="brand" href="<?= Ui::escape($config->url('/')) ?>"><span class="brand-mark"><?= $ui->icon('box') ?></span>BizStock</a>
-<?php if($screen==='login'): ?><a class="back-home" href="<?= Ui::escape($config->url('/')) ?>">Back to home</a><?php endif; ?>
+<?php if($screen==='account'): ?><a class="brand" href="<?= Ui::escape($config->url('/')) ?>"><span class="brand-mark"><?= $ui->icon('box') ?></span>BizStock</a><?php endif; ?>
 <section class="panel login-card" aria-labelledby="auth-title">
 <h1 id="auth-title"><?= $screen==='login'?'Welcome back':'Your account' ?></h1>
 <?php if($user): ?>
@@ -39,5 +39,5 @@
 </form>
 <?php if($screen==='account'): ?><div data-auth-logout><?= $ui->component('button',['label'=>'Sign out','variant'=>'secondary']) ?></div><?php endif; ?>
 </section></div>
-<?php if($screen==='login'): ?><aside class="login-visual" aria-labelledby="role-signin-title"><img src="<?= Ui::escape($ui->asset('images/stockroom-960.webp')) ?>" srcset="<?= Ui::escape($ui->asset('images/stockroom-480.webp')) ?> 480w, <?= Ui::escape($ui->asset('images/stockroom-960.webp')) ?> 960w" sizes="(max-width:900px) 100vw, 520px" width="960" height="640" alt=""><div class="login-visual-copy"><p class="eyebrow">Your business workspace</p><h2 id="role-signin-title">Organized stock.<br>A confident team.</h2><p>Manage products, record stock movements and see what needs attention, all in one place.</p><p class="login-visual-caption">Illustrative stockroom scene. Generated people are fictional.</p></div></aside><?php endif; ?>
-</main></body></html>
+<?php if($screen==='login'): ?><aside class="login-visual" aria-labelledby="role-signin-title"><div class="login-visual-copy"><h2 id="role-signin-title">Your inventory.<br>Under control.</h2><p>Track stock, manage your team and keep your business moving.</p></div><img src="<?= Ui::escape($ui->asset('images/login-inventory-960.webp')) ?>" srcset="<?= Ui::escape($ui->asset('images/login-inventory-480.webp')) ?> 480w, <?= Ui::escape($ui->asset('images/login-inventory-960.webp')) ?> 960w, <?= Ui::escape($ui->asset('images/login-inventory-1280.webp')) ?> 1280w" sizes="(max-width:900px) 100vw, 600px" width="1536" height="1024" alt="Organized shelves and cartons with a barcode scanner and stock tablet" data-login-illustration><p class="login-image-fallback" data-login-fallback hidden>Organized inventory, ready for your next business day.</p></aside><?php endif; ?>
+</main><?php if($screen==='login'): ?><footer class="login-footer">BizStock <span aria-hidden="true">&middot;</span> Your business inventory workspace</footer><?php endif; ?></body></html>

@@ -39,9 +39,10 @@
   };
   const showError = error => { const text=`${error.message}${error.requestId ? ` Reference: ${error.requestId}` : ''}`; if(window.BizStockUI) BizStockUI.showMessage(errors,text,true); else { errors.textContent=text;errors.hidden=false;errors.focus(); } };
   const busy = value => { pending = value; [...form.querySelectorAll('button'),...(logout?[logout]:[])].forEach(button => { button.disabled = value; button.setAttribute('aria-busy', String(value)); }); };
-  const guidance={Admin:'Admin: manage products, suppliers, categories and accounts; review reports and correct movements.',Staff:'Staff: record stock IN and OUT; read products, suppliers, history and reports.',Viewer:'Viewer: check product availability and low-stock alerts. Prices, suppliers, movements and reports are restricted.'};
+  const illustration=document.querySelector('[data-login-illustration]');if(illustration){const fallback=()=>{illustration.hidden=true;document.querySelector('[data-login-fallback]').hidden=false;};illustration.addEventListener('error',fallback);if(illustration.complete&&!illustration.naturalWidth)fallback();}
+  const guidance={Admin:'Manage inventory, accounts and corrections.',Staff:'Record stock IN/OUT and read reports.',Viewer:'View product availability and low-stock alerts.'};
   const roleButtons=[...form.querySelectorAll('[data-role-hint]')];
-  function selectRole(role,focus=false){if(!Object.hasOwn(guidance,role))return;roleButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.roleHint===role)));document.getElementById('role-guidance').textContent=guidance[role]+' Your authenticated account determines access.';if(focus)form.elements.username.focus();}
+  function selectRole(role,focus=false){if(!Object.hasOwn(guidance,role))return;roleButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.roleHint===role)));document.getElementById('role-guidance').textContent=guidance[role]+' Your account determines access.';if(focus)form.elements.username.focus();}
   roleButtons.forEach(button=>button.addEventListener('click',()=>selectRole(button.dataset.roleHint,true)));
   const selected=roleButtons.find(button=>button.getAttribute('aria-pressed')==='true');if(selected)selectRole(selected.dataset.roleHint);
   // The public login stays put for generic wrong-password 401; account errors require reauthentication.

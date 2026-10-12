@@ -1,6 +1,7 @@
 <?php declare(strict_types=1); ?>
 <section data-loading><?= $ui->component('state',['state'=>'loading','heading'=>'Loading product form','message'=>'Loading categories, suppliers and current metadata.']) ?></section>
 <form data-product-form data-unsaved-form class="form-layout" hidden>
+<a class="form-back" href="<?= \BizStock\Support\Ui::escape($config->url('/products')) ?>">← Back to products</a>
 <div data-form-errors class="notice notice--error" role="alert" tabindex="-1" hidden></div>
 <fieldset class="panel"><legend class="form-legend">Product details</legend><div class="form-grid">
 <?php foreach([['sku','SKU',64],['product_name','Product name',150],['location','Location (optional)',100]] as [$key,$label,$max]): ?><?= $ui->component('field',['id'=>$key,'label'=>$label,'required'=>$key!=='location','maxlength'=>$max]) ?><?php endforeach; ?>

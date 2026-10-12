@@ -2,7 +2,10 @@
   --bs-body-font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   --bs-body-bg: #f8fafc; --bs-body-color: #0f172a;
   --bs-primary: #1d4ed8; --bs-primary-rgb: 29,78,216;
-  --canvas: #f3f6fa; --surface: #fff; --text: #17263c; --muted: #526176;
+  --canvas: #f3f6fa; --surface: #fff; --text: #243244; --muted: #526176;
+  --font-body: .9375rem; --font-title: 2rem; --font-section: 1.25rem;
+  --font-control: .9375rem; --font-table: .875rem; --font-label: .875rem; --font-help: .8125rem;
+  --content-gutter: 2rem; --panel-padding: 1.5rem; --control-height: 2.75rem;
   --border: #e2e8f0; --control-border: #64748b; --primary: #1d4ed8; --primary-hover: #1e40af;
   --low-text: #92400e; --low-bg: #fef3c7; --out-text: #991b1b; --out-bg: #fee2e2;
   --in-text: #166534; --in-bg: #dcfce7;
@@ -11,14 +14,16 @@
   --navy: #15243b; --accent-soft: #eef4ff; --shadow: 0 2px 8px rgb(20 36 60 / .035);
 }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--canvas); color: var(--text); font-size: 16px; line-height: 1.6; }
-h1 { font-size: 30px; font-weight: 700; letter-spacing: -.035em; }
-h2 { font-size: 20px; font-weight: 600; }
-h3 { font-size: 16px; font-weight: 600; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--canvas); color: var(--text); font-size: var(--font-body); line-height: 1.6; }
+h1 { font-size: var(--font-title); font-weight: 700; letter-spacing: -.035em; }
+h2 { font-size: var(--font-section); font-weight: 600; }
+h3 { font-size: 1rem; font-weight: 600; }
 a { color: var(--primary); text-underline-offset: 3px; }
 button, input, select, textarea { font: inherit; }
 :focus-visible { outline: 3px solid var(--primary) !important; outline-offset: 3px; box-shadow: none !important; }
 [hidden] { display: none !important; }
 .numeric, .metric-value { font-variant-numeric: tabular-nums; }
 .muted { color: var(--muted); }
+@media(max-width:900px) { :root { --content-gutter:1.5rem; } }
+@media(max-width:600px) { :root { --content-gutter:1rem; --panel-padding:1rem; --font-title:1.75rem; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }

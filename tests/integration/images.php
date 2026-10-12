@@ -38,6 +38,8 @@ try{
  $f->check($upload($product,$admin,$png)[0]===500,'audit failure refuses upload success');$f->pdo->exec('DROP TRIGGER images_reject_audit');
  $f->check($f->pdo->query('SELECT product_image FROM products WHERE product_id='.$id)->fetchColumn()===$current&&count(glob($store.'/*.webp'))===1,'audit rollback preserves reference and cleans staged file');
  [$status,$data,$headers,$raw]=$f->http($product,$viewer);$f->check($status===200&&str_starts_with($raw,'RIFF')&&str_contains(implode(' ',$headers),'private, no-store'),'Viewer permitted image controlled WebP response');
+ foreach(['thumbnail'=>96,'card'=>320] as $size=>$bound){[$status,, $headers,$raw]=$f->http($product.'?size='.$size,$viewer);$dimensions=getimagesizefromstring($raw);$f->check($status===200&&max($dimensions[0],$dimensions[1])<=$bound&&str_contains(implode(' ',$headers),'private, no-store'),'bounded private '.$size.' derivative');}
+ $f->check($f->http($product.'?size=original',$viewer)[0]===422,'invalid derivative rejected');$f->check($f->http($product.'?size=thumbnail',$admin,'DELETE',null,$admin['token'])[0]===422,'mutation rejects image-size query');
  $none=[];$f->check($f->http($product, $none)[0]===401,'anonymous read denied');
  foreach([$admin,$staff,$viewer] as $jar){$f->check($upload('/api/v1/account/photo',$jar,$png)[0]===200,'own profile upload all roles');$f->check($f->http('/api/v1/auth/me',$jar)[1]['data']['has_image']===true,'profile flag only');$f->check($f->http('/api/v1/account/photo',$jar,'DELETE',null,$jar['token'])[0]===200,'own photo removal');$f->check($f->http('/api/v1/account/photo',$jar)[0]===404,'default avatar after removal');}
  $f->check($f->http($product,$staff,'DELETE',null,$staff['token'])[0]===403,'non-Admin removal denied');

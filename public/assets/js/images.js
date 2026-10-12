@@ -2,7 +2,7 @@
  'use strict';const api=new BizStockApi.ApiClient(),base=document.querySelector('meta[name="app-base-path"]').content;
  const failure=e=>e.message+(e.requestId?' Reference: '+e.requestId:'');
  const own=document.querySelectorAll('[data-own-avatar]');
- function avatars(has){own.forEach(el=>{el.querySelector('img')?.remove();el.classList.toggle('has-photo',has);if(has){const img=document.createElement('img');img.alt='';img.src=`${base}/api/v1/account/photo`;el.append(img);}});}
+ function avatars(has){own.forEach(el=>{el.querySelector('img')?.remove();el.classList.toggle('has-photo',has);if(has){const img=document.createElement('img');img.alt='';img.addEventListener('error',()=>img.remove(),{once:true});img.src=`${base}/api/v1/account/photo`;el.append(img);}});}
  if(own.length)avatars(own[0].dataset.hasImage==='true');
  document.querySelectorAll('[data-image-editor]').forEach(root=>{
   const endpoint=root.dataset.imageEditor,form=root.querySelector('form'),image=root.querySelector('[data-image-preview]'),remove=root.querySelector('[data-image-remove]'),message=root.querySelector('[data-image-message]'),selection=root.querySelector('[data-selected-image]'),preview=root.querySelector('[data-selected-preview]'),cancel=root.querySelector('[data-image-cancel]');let has=false,busy=false,previewUrl=null;

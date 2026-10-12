@@ -63,7 +63,8 @@ final class BusinessFixture
     public function browser(string $script): void
     {
         if($this->origin===''){$this->serve();}
-        $process=proc_open(['node',$script],[0=>['pipe','r'],1=>['pipe','w'],2=>['pipe','w']],$pipes,$this->config->root,array_replace(getenv(),['BUSINESS_ORIGIN'=>$this->origin,'BUSINESS_PASSWORD'=>$this->password]),['bypass_shell'=>true]);fclose($pipes[0]);$out=stream_get_contents($pipes[1]);$err=stream_get_contents($pipes[2]);fclose($pipes[1]);fclose($pipes[2]);$exit=proc_close($process);if($exit!==0){throw new RuntimeException('Browser acceptance failed (exit '.$exit.', '.$script.'): '.$err);}echo $out;$this->check(true,'browser acceptance');
+        // One drained stream avoids deadlock when a large browser assertion fills stderr.
+        $process=proc_open(['node',$script],[0=>['pipe','r'],1=>['pipe','w'],2=>['redirect',1]],$pipes,$this->config->root,array_replace(getenv(),['BUSINESS_ORIGIN'=>$this->origin,'BUSINESS_PASSWORD'=>$this->password]),['bypass_shell'=>true]);fclose($pipes[0]);$out=str_replace($this->password,'[redacted]',stream_get_contents($pipes[1]));fclose($pipes[1]);$exit=proc_close($process);if($exit!==0){throw new RuntimeException('Browser acceptance failed (exit '.$exit.', '.$script.'): '.$out);}echo $out;$this->check(true,'browser acceptance');
     }
     public function close(): void {
         foreach($this->servers as $server){proc_terminate($server);proc_close($server);}if($this->pdo->inTransaction()){$this->pdo->rollBack();}$this->admin->exec('DROP DATABASE `'.$this->config->dbName.'`');

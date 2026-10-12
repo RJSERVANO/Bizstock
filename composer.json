@@ -63,7 +63,9 @@
     "test:install": "@php tests/integration/install.php",
     "test:images": "@php tests/integration/images.php",
     "test:homepage": "@php tests/integration/homepage.php",
-    "test:usability": "@php tests/integration/usability.php"
+    "test:usability": "@php tests/integration/usability.php",
+    "test:permissions": "@php tests/integration/permissions.php",
+    "test:login-design": "@php tests/integration/login-design.php"
   },
   "config": {
     "sort-packages": true,

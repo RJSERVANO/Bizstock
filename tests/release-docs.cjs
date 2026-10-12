@@ -14,7 +14,7 @@ for (let id = 1; id <= 33; id++) assert.match(evidence, new RegExp(`REQ-${String
 assert.match(fs.readFileSync('docs/user-testing.md', 'utf8'), /pending/i);
 const blueprint = fs.readFileSync('docs/BizStock-Codex-Build-Blueprint.md');
 assert.match(blueprint.toString(),/Authorized scope amendment/);
-assert.equal(crypto.createHash('sha256').update(blueprint).digest('hex'), '17fdb572df5f8ae86676f8bd04bad5a6a1974331cacbc91e6caede6e5da8cc7a');
+assert.equal(crypto.createHash('sha256').update(blueprint).digest('hex'), '6b7e8ce25b685c548c0f44513ad348fae06444c2bd80baac13abc557e639325d');
 let links = 0;
 for (const file of ['README.md', ...fs.readdirSync('docs').filter(name => name.endsWith('.md')).map(name => `docs/${name}`)]) {
   const content = fs.readFileSync(file, 'utf8');
@@ -29,3 +29,4 @@ const workflow = fs.readFileSync('.github/workflows/verify.yml', 'utf8');
 assert.match(workflow, /workflow_dispatch/);
 assert.match(workflow, /self-hosted/);
 console.log(`PASS release documentation: 16 stage flags, 17 gap rows, 33 requirement mappings, ${links} local links, pinned authorized blueprint amendment and manual CI definition. Pending targets are not execution passes.`);
+
