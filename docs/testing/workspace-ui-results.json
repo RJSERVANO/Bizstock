@@ -1,0 +1,13 @@
+{
+  "browser": "Chrome headless",
+  "assertions": 208,
+  "clean_axe_scans": 33,
+  "widths": [
+    360,
+    768,
+    1440
+  ],
+  "fixture": "randomized disposable MariaDB; installed records not used",
+  "native_browser_zoom": "Not performed",
+  "manual_screen_reader": "Not performed"
+}

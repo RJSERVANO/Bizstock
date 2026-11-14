@@ -11,11 +11,12 @@ final readonly class HistoryRepository
         $where=[];$values=[];
         foreach(['product_id','user_id','category_id'] as $field){if(isset($query[$field])){$where[]=($field==='category_id'?'p.':'t.').$field.'=?';$values[]=ApiInput::integer($query[$field],$field,1);}}
         if(isset($query['type'])){$where[]='t.type=?';$values[]=ApiInput::choice($query['type'],'type',['IN','OUT']);}
+        if(isset($query['reason_code'])){$where[]='t.reason_code=?';$values[]=ApiInput::choice($query['reason_code'],'reason_code',array_keys(\BizStock\Support\MovementReasons::CODES));}
         $dates=ApiInput::dateRange($query);
         foreach($dates as $field=>$date){$time=new \DateTimeImmutable($date,new \DateTimeZone('Asia/Manila'));if($field==='date_to'){$time=$time->modify('+1 day');}$where[]='t.transaction_date '.($field==='date_from'?'>=':'<').' ?';$values[]=$time->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');}
         return [($where?' WHERE '.implode(' AND ',$where):''),$values];
     }
-    private const SELECT="SELECT t.transaction_id,t.product_id,t.user_id,t.type,t.quantity,t.unit_price,t.transaction_date,t.correction_of_transaction_id,t.notes,p.sku,p.product_name,u.full_name AS actor_name,r.transaction_id AS reversed_by_transaction_id FROM transactions t JOIN products p ON p.product_id=t.product_id JOIN users u ON u.user_id=t.user_id LEFT JOIN transactions r ON r.correction_of_transaction_id=t.transaction_id";
+    private const SELECT="SELECT t.transaction_id,t.product_id,t.user_id,t.type,t.quantity,t.unit_price,t.transaction_date,t.correction_of_transaction_id,t.notes,t.reason_code,t.reference_number,t.party_text,t.movement_kind,t.unit_code,cl.count_id,p.sku,p.product_name,u.full_name AS actor_name,r.transaction_id AS reversed_by_transaction_id FROM transactions t JOIN products p ON p.product_id=t.product_id JOIN users u ON u.user_id=t.user_id LEFT JOIN transactions r ON r.correction_of_transaction_id=t.transaction_id LEFT JOIN stock_count_lines cl ON cl.adjustment_transaction_id=t.transaction_id";
     public static function project(array $row): array
     { $row['transaction_date']=(new \DateTimeImmutable($row['transaction_date'],new \DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.u\Z');return $row; }
     public function detail(int $id): ?array

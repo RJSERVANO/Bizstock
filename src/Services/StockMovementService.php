@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace BizStock\Services;
 use BizStock\Http\{Authorization,HttpException};
-use BizStock\Support\{ApiInput,AtomicWrite,CanonicalJson};
+use BizStock\Support\{ApiInput,AtomicWrite,CanonicalJson,MovementReasons};
 use BizStock\Repositories\{StockRepository,OperationRepository};
 
 final readonly class StockMovementService
@@ -14,8 +14,9 @@ final readonly class StockMovementService
             if(array_diff(array_keys($body),['correction_of_transaction_id','notes'])){throw new HttpException(422,'VALIDATION_ERROR','A reversal derives product, type, quantity and price from its original.');}
             return ['correction_of_transaction_id'=>ApiInput::integer($body['correction_of_transaction_id'],'correction_of_transaction_id',1),'notes'=>ApiInput::text($body['notes']??null,'notes',2000)];
         }
-        if(array_diff(array_keys($body),['product_id','type','quantity','notes'])){throw new HttpException(422,'VALIDATION_ERROR','Unknown movement field.');}
-        return ['product_id'=>ApiInput::integer($body['product_id']??null,'product_id',1),'type'=>ApiInput::choice($body['type']??null,'type',['IN','OUT']),
+        if(array_diff(array_keys($body),['product_id','type','quantity','notes','reason_code','reference_number','party_text'])){throw new HttpException(422,'VALIDATION_ERROR','Unknown movement field.');}
+        $extra=[];if(array_key_exists('reason_code',$body))$extra['reason_code']=MovementReasons::validate(ApiInput::text($body['reason_code'],'reason_code',32),ApiInput::choice($body['type']??null,'type',['IN','OUT']));foreach(['reference_number'=>100,'party_text'=>150] as $field=>$max)if(array_key_exists($field,$body))$extra[$field]=$body[$field]===null?null:ApiInput::text($body[$field],$field,$max,false);
+        return $extra+['product_id'=>ApiInput::integer($body['product_id']??null,'product_id',1),'type'=>ApiInput::choice($body['type']??null,'type',['IN','OUT']),
             'quantity'=>ApiInput::integer($body['quantity']??null,'quantity',1),'notes'=>($body['notes']??null)===null?null:ApiInput::text($body['notes'],'notes',2000,false)];
     }
     public function record(array $body,array $actor,string $key): array
@@ -25,7 +26,7 @@ final readonly class StockMovementService
         return AtomicWrite::run($this->pdo,$actor,$roles,fn(array $current)=>$this->recordInTransaction($data,$current,$key));
     }
     // Trusted callers own the transaction and locked/current authorized actor; never commits nested work.
-    public function recordInTransaction(array $data,array $actor,string $key): array
+    public function recordInTransaction(array $data,array $actor,string $key,string $kind='ordinary'): array
     {
         if(!$this->pdo->inTransaction()){throw new \LogicException('Movement requires caller transaction.');}
         $data=self::validate($data);$key=ApiInput::operationKey($key);
@@ -33,9 +34,9 @@ final readonly class StockMovementService
         if(!$actor['is_active'] || $actor['must_change_password']){throw new HttpException(403,'FORBIDDEN','Access denied.');}
         $hash=hash('sha256',CanonicalJson::encode($data));$ops=new OperationRepository($this->pdo);
         $replay=$ops->reserve((int)$actor['user_id'],'movement',$key,$hash);if($replay!==null){return $replay;}
-        $result=$this->appendInTransaction($data,$actor,$key,$hash);return $ops->complete((int)$actor['user_id'],$key,$result['product_id'],$result['transaction_id'],$result);
+        $result=$this->appendInTransaction($data,$actor,$key,$hash,$kind);return $ops->complete((int)$actor['user_id'],$key,$result['product_id'],$result['transaction_id'],$result);
     }
-    public function appendInTransaction(array $data,array $actor,string $key,string $hash): array
+    public function appendInTransaction(array $data,array $actor,string $key,string $hash,string $kind='ordinary'): array
     {
         if(!$this->pdo->inTransaction()){throw new \LogicException('Movement requires caller transaction.');}
         $data=self::validate($data);$key=ApiInput::operationKey($key);
@@ -54,7 +55,8 @@ final readonly class StockMovementService
         if($original && $repository->reversed((int)$original['transaction_id'])){throw new HttpException(409,'REVERSAL_CONFLICT','The original movement already has a reversal.');}
         $quantity=$data['quantity'];$balance=(int)$product['quantity']+($data['type']==='IN'?$quantity:-$quantity);
         if($balance<0){throw new HttpException(409,'INSUFFICIENT_STOCK','Available stock is insufficient.');}
-        if($balance>2147483647 || (int)$product['version']>=2147483647){throw new HttpException(409,'STOCK_OVERFLOW','Stock or version limit exceeded.');}
-        return $repository->append($product,(int)$actor['user_id'],$data['type'],$quantity,$original['unit_price']??$product['price'],$key,$hash,$data['notes'],$original?(int)$original['transaction_id']:null);
+        if($balance>2147483647 || ((int)$product['version']>=2147483647||(int)$product['stock_revision']>=2147483647)){throw new HttpException(409,'STOCK_OVERFLOW','Stock or version limit exceeded.');}
+        $context=['reason_code'=>$data['reason_code']??null,'reference_number'=>$data['reference_number']??null,'party_text'=>$data['party_text']??null,'movement_kind'=>$original?'reversal':$kind,'unit_code'=>$original?($original['unit_code']??null):$product['unit_code']];
+        return $repository->append($product,(int)$actor['user_id'],$data['type'],$quantity,$original['unit_price']??$product['price'],$key,$hash,$data['notes'],$original?(int)$original['transaction_id']:null,$context);
     }
 }

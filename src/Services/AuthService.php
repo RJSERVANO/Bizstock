@@ -39,6 +39,7 @@ final readonly class AuthService
             $locked=$repository->byId((int)$user['user_id'],true);
             if (!$locked || !$locked['is_active'] || $locked['password_hash']!==$user['password_hash']
                 || $locked['session_version']!==$user['session_version']) { throw new HttpException(401,'INVALID_CREDENTIALS','Invalid username or password.'); }
+            $repository->successfulLogin((int)$locked['user_id']);$locked=$repository->byId((int)$locked['user_id']);
             $pdo->commit();
         } catch (\Throwable $error) { if($pdo->inTransaction()){$pdo->rollBack();} throw $error; }
         $this->sessions->authenticate($locked); return $locked;

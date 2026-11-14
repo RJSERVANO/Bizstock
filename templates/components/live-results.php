@@ -1,6 +1,6 @@
-<?php declare(strict_types=1); ?>
-<section data-loading><?= $ui->component('state',['state'=>'loading','heading'=>'Loading records','message'=>'Fetching current database records.']) ?></section>
-<section data-empty hidden><?= $ui->component('state',['state'=>'empty','heading'=>'No matching records','message'=>'Adjust the filters or add a record if you have permission.']) ?></section>
-<section data-error hidden><?= $ui->component('state',['state'=>'error','heading'=>'Records could not be loaded','message'=>'Use Refresh to try again.','retryHref'=>'/'.$screen]) ?></section>
+<?php declare(strict_types=1); $task=$screen==='analytics'||$screen==='stock-counts'; ?>
+<section data-loading><?= $ui->component('state',['state'=>'loading','heading'=>$task?($screen==='analytics'?'Loading movement analytics':'Loading physical counts'):'Loading records','message'=>$task?'Fetching the current view.':'Fetching current database records.']) ?></section>
+<section data-empty hidden><?= $ui->component('state',['state'=>'empty','heading'=>$task?($screen==='analytics'?'No qualifying movements':'No physical counts yet'):'No matching records','message'=>$task?($screen==='analytics'?'Try a different period or analysis view.':'Start a count to compare physical quantities with recorded stock.'):'Adjust the filters or add a record if you have permission.']) ?></section>
+<section data-error hidden><?= $ui->component('state',['state'=>'error','heading'=>'Records could not be loaded','message'=>'Use Refresh to try again.','retryHref'=>$screen==='reports'?'/reports/'.($id?'transactions':'inventory'):'/'.$screen]) ?></section>
 <div data-results class="panel table-panel" hidden><?= $ui->component('table',['caption'=>$title,'columns'=>$columns,'rows'=>[]]) ?></div>
 <nav data-pagination aria-label="Pagination" hidden><span data-page-label></span><button class="bs-button bs-button--secondary" data-previous type="button">Previous</button><button class="bs-button bs-button--secondary" data-next type="button">Next</button></nav>

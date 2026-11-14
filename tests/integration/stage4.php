@@ -53,9 +53,9 @@ try{
     $sql($pdo,"INSERT INTO transactions(product_id,user_id,type,quantity,unit_price,request_key,payload_hash) VALUES (?,?,'IN',3,'245.00','upgrade-opening',?)",[$product,$actor,$fingerprint]);$original=(int)$pdo->lastInsertId();
     $before=[];foreach(['users','categories','suppliers','products','transactions'] as $table){$before[$table]=$pdo->query("SELECT * FROM `{$table}` ORDER BY 1")->fetchAll();}
     $result=$runner->run();$check($result['002_support.sql']==='applied' && $result['003_access_indexes.sql']==='applied','additive upgrade applied');
-    foreach($before as $table=>$rows){$after=$pdo->query("SELECT * FROM `{$table}` ORDER BY 1")->fetchAll();foreach($after as &$r){unset($r['profile_image'],$r['product_image']);}unset($r);$check($rows===$after,'upgrade preserved '.$table);}
-    $state=$snapshot($pdo);$check(count(array_filter($runner->run(),static fn(string $status):bool=>$status==='already applied'))===4 && $snapshot($pdo)===$state,'safe rerun preserves all rows/checksums/timestamps');
-    $check((int)$pdo->query('SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE()')->fetchColumn()===10,'five domain and five supporting tables');
+    foreach($before as $table=>$rows){$after=$pdo->query("SELECT * FROM `{$table}` ORDER BY 1")->fetchAll();foreach($after as &$r){$r=array_intersect_key($r,$rows[0]);}unset($r);$check($rows===$after,'upgrade preserved '.$table);}
+    $state=$snapshot($pdo);$check(count(array_filter($runner->run(),static fn(string $status):bool=>$status==='already applied'))===7 && $snapshot($pdo)===$state,'safe rerun preserves all rows/checksums/timestamps');
+    $check((int)$pdo->query('SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE()')->fetchColumn()===12,'core tables plus physical count header/lines');
     $check((int)$pdo->query("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND ENGINE<>'InnoDB'")->fetchColumn()===0,'all tables InnoDB');
     $check((int)$pdo->query('SELECT COUNT(*) FROM security_locks WHERE lock_id=1')->fetchColumn()===1,'single security sentinel');
     $reject(fn()=>$pdo->exec('INSERT INTO security_locks VALUES (2)'),'constraint','extra security sentinel rejected');

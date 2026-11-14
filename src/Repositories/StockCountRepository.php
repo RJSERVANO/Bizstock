@@ -1,0 +1,15 @@
+<?php
+declare(strict_types=1);namespace BizStock\Repositories;
+use BizStock\Support\ApiInput;
+final readonly class StockCountRepository
+{
+ public function __construct(private \PDO $pdo){}
+ private static function dates(array $row):array{foreach(['created_at','updated_at','approved_at'] as $key)if(!empty($row[$key]))$row[$key]=(new \DateTimeImmutable($row[$key],new \DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.u\Z');return $row;}
+ public function find(int $id,bool $lock=false):?array{$q=$this->pdo->prepare('SELECT * FROM stock_counts WHERE count_id=?'.($lock?' FOR UPDATE':''));$q->execute([$id]);$row=$q->fetch();return $row?self::dates($row):null;}
+ public function lines(int $id):array{$q=$this->pdo->prepare('SELECT *,counted_quantity-expected_quantity AS discrepancy FROM stock_count_lines WHERE count_id=? ORDER BY product_id');$q->execute([$id]);return $q->fetchAll();}
+ public function listing(array $query):array{$page=ApiInput::page($query,['count_id'=>'count_id','created_at'=>'created_at'],'count_id');$where='';$values=[];if(isset($query['status'])){$where=' WHERE status=?';$values[]=ApiInput::choice($query['status'],'status',['draft','submitted','approved','cancelled']);}$q=$this->pdo->prepare('SELECT COUNT(*) FROM stock_counts'.$where);$q->execute($values);$total=(int)$q->fetchColumn();$q=$this->pdo->prepare('SELECT * FROM stock_counts'.$where.' ORDER BY '.$page['order_by'].' '.$page['direction'].',count_id ASC LIMIT ? OFFSET ?');foreach($values as $i=>$v)$q->bindValue($i+1,$v);$q->bindValue(count($values)+1,$page['per_page'],\PDO::PARAM_INT);$q->bindValue(count($values)+2,$page['offset'],\PDO::PARAM_INT);$q->execute();return ['data'=>array_map(self::dates(...),$q->fetchAll()),'meta'=>['page'=>$page['page'],'per_page'=>$page['per_page'],'total'=>$total,'total_pages'=>(int)ceil($total/$page['per_page'])]];}
+ public function create(int $actor,?string $note):int{$q=$this->pdo->prepare('INSERT INTO stock_counts(created_by,note) VALUES (?,?)');$q->execute([$actor,$note]);return (int)$this->pdo->lastInsertId();}
+ public function saveLine(int $count,array $line):void{$fields=['product_id','sku_snapshot','product_name_snapshot','unit_code','expected_quantity','expected_revision','counted_quantity','reason'];$q=$this->pdo->prepare('INSERT INTO stock_count_lines(count_id,'.implode(',',$fields).') VALUES (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE '.implode(',',array_map(fn($key)=>$key.'=VALUES('.$key.')',array_slice($fields,1))));$q->execute([$count,...array_map(fn($key)=>$line[$key],$fields)]);}
+ public function advance(int $id,?string $status=null,?int $approver=null):void{$q=$this->pdo->prepare('UPDATE stock_counts SET version=version+1,updated_at=UTC_TIMESTAMP(6)'.($status!==null?',status=?':'').($approver!==null?',approved_by=?,approved_at=UTC_TIMESTAMP(6)':'').' WHERE count_id=?');$q->execute([...($status!==null?[$status]:[]),...($approver!==null?[$approver]:[]),$id]);}
+ public function link(int $count,int $product,int $transaction):void{$q=$this->pdo->prepare('UPDATE stock_count_lines SET adjustment_transaction_id=? WHERE count_id=? AND product_id=?');$q->execute([$transaction,$count,$product]);}
+}

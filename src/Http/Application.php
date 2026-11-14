@@ -35,6 +35,15 @@ final readonly class Application
         $lookups=new \BizStock\Http\Controllers\LookupController($auth,$sessions,new \BizStock\Services\LookupService($factory),$this->config);
         if($path==='/api/v1' || str_starts_with($path,'/api/v1/')){
             $router=new ApiRouter();
+            $counts=new Controllers\StockCountController($factory,$auth,$sessions);
+            $router->add('/api/v1/stock-counts',['GET','POST'],fn():Response=>$counts->handle($method,null,null,null,$uri,$requestId));
+            $router->add('/api/v1/stock-counts/{id}',['GET'],fn(array $p):Response=>$counts->handle($method,$p['id'],null,null,$uri,$requestId));
+            $router->add('/api/v1/stock-counts/{id}/lines/{product_id}',['PATCH'],fn(array $p):Response=>$counts->handle($method,$p['id'],$p['product_id'],null,$uri,$requestId));
+            foreach(['submit','approve','cancel','return_to_draft'] as $action)$router->add('/api/v1/stock-counts/{id}/'.$action,['POST'],fn(array $p):Response=>$counts->handle($method,$p['id'],null,$action,$uri,$requestId));
+            $router->add('/api/v1/analytics',['GET'],function()use($auth,$factory,$uri):Response{$actor=$auth->current();Authorization::requireRole($actor,['Admin','Staff']);$query=ApiInput::query(explode('?',$uri,2)[1]??'',['period','date_from','date_to','group','page','per_page']);$r=(new \BizStock\Services\AnalyticsService($factory->connection()))->read($query,$actor['role']);return Response::success($r['data'],$r['meta']);});
+            $router->add('/api/v1/products/{id}/unit',['PATCH'],function(array $params)use($auth,$sessions,$factory,$uri,$requestId):Response{$actor=$auth->current();Authorization::requireRole($actor,['Admin']);$sessions->verifyCsrf();ApiInput::query(explode('?',$uri,2)[1]??'',[]);return Response::success((new \BizStock\Services\ProductService($factory->connection()))->classify($params['id'],ApiInput::body(['unit_code','expected_version']),$actor,$requestId));});
+            $router->add('/api/v1/history/actors',['GET'],function()use($auth,$factory,$uri):Response{$actor=$auth->current();Authorization::requireRole($actor,['Admin','Staff']);$query=ApiInput::query(explode('?',$uri,2)[1]??'',['q','page','per_page','sort','direction']);$r=(new \BizStock\Repositories\HistoryActorRepository($factory->connection()))->listing($query);return Response::success($r['data'],$r['meta']);});
+            $router->add('/api/v1/products/{id}/restore',['POST'],function(array $params)use($auth,$sessions,$factory,$uri,$requestId):Response{$actor=$auth->current();Authorization::requireRole($actor,['Admin']);$sessions->verifyCsrf();ApiInput::query(explode('?',$uri,2)[1]??'',[]);return Response::success((new \BizStock\Services\ProductService($factory->connection()))->restore($params['id'],ApiInput::body(['expected_version']),$actor,$requestId));});
             $images=new Controllers\ImageController($this->config,$factory,$auth,$sessions);
             $profile=new Controllers\ProfileController($factory,$auth,$sessions);
             $router->add('/api/v1/account/profile',['PATCH'],fn():Response=>$profile->handle($uri,$requestId));
@@ -86,13 +95,13 @@ final readonly class Application
             }
             return $router->dispatch($method,$path);
         }
-        if(in_array($path,['/dashboard','/movements','/history','/reports/inventory','/reports/transactions','/users','/audit-events'],true)){
+        if(in_array($path,['/dashboard','/movements','/history','/reports/inventory','/reports/transactions','/users','/audit-events','/help','/analytics','/stock-counts'],true)){
             if(!in_array($method,['GET','HEAD'],true)){throw new HttpException(405,'METHOD_NOT_ALLOWED','Method not allowed.',[],['Allow'=>'GET, HEAD']);}
-            return (new Controllers\BusinessPageController($this->config,$auth))->page(str_starts_with($path,'/reports/')?'reports':substr($path,1),$path==='/reports/transactions'?1:null);
+            return (new Controllers\BusinessPageController($this->config,$auth))->page(str_starts_with($path,'/reports/')?'reports':substr($path,1),$path==='/reports/transactions'?1:null,$uri);
         }
         if($path==='/products'||$path==='/products/new'||preg_match('~^/products/([1-9][0-9]*)/edit$~D',$path,$productPage)){
             if(!in_array($method,['GET','HEAD'],true)){throw new HttpException(405,'METHOD_NOT_ALLOWED','Method not allowed.',[],['Allow'=>'GET, HEAD']);}
-            return (new Controllers\BusinessPageController($this->config,$auth))->page($path==='/products'?'products':'product-form',isset($productPage[1])?ApiInput::integer($productPage[1],'id',1):null);
+            return (new Controllers\BusinessPageController($this->config,$auth))->page($path==='/products'?'products':'product-form',isset($productPage[1])?ApiInput::integer($productPage[1],'id',1):null,$uri);
         }
         if(in_array($path,['/categories','/suppliers'],true)) {
             if(!in_array($method,['GET','HEAD'],true)){throw new HttpException(405,'METHOD_NOT_ALLOWED','Method not allowed.',[],['Allow'=>'GET, HEAD']);}

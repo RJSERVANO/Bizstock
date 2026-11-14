@@ -13,8 +13,8 @@ final readonly class LookupService
     { return $resource==='categories'?['category_name']:['supplier_name','contact_email']; }
     public static function project(string $resource, array $row): array
     {
-        if($resource==='categories'){return Authorization::category($row);}
-        $safe=array_intersect_key($row,array_flip(['supplier_id','supplier_name','contact_email','created_at']));
+        if($resource==='categories'){return Authorization::category($row)+array_intersect_key($row,array_flip(['active_product_count','archived_product_count','edit_version']));}
+        $safe=array_intersect_key($row,array_flip(['supplier_id','supplier_name','contact_email','created_at','active_product_count','archived_product_count','edit_version']));
         $safe['created_at']=(new \DateTimeImmutable($safe['created_at'],new \DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.u\Z'); return $safe;
     }
     public function listing(string $resource, array $query): array
@@ -22,7 +22,8 @@ final readonly class LookupService
         $id=$resource==='categories'?'category_id':'supplier_id'; $name=self::fields($resource)[0];
         $page=ApiInput::page($query,[$id=>$id,$name=>$name],$id);
         $search=isset($query['q'])?ApiInput::text($query['q'],'q',100,false):'';
-        $result=(new LookupRepository($this->factory->connection(),$resource))->listing($search,$page);
+        $result=(new LookupRepository($this->factory->connection(),$resource))->listing($search,$page,isset($query['include_products'])?ApiInput::boolean($query['include_products'],'include_products'):false);
+        if(!($query['include_edit_version']??false))foreach($result['rows'] as &$row)unset($row['edit_version']);unset($row);
         return ['data'=>array_map(static fn(array $row)=>self::project($resource,$row),$result['rows']),'meta'=>$result['meta']];
     }
     private function validate(string $resource, array $body, bool $create): array
@@ -42,6 +43,7 @@ final readonly class LookupService
     }
     public function mutate(string $resource, string $method, ?int $id, array $body, array $actor, string $requestId): array
     {
+        $expected=isset($body['expected_edit_version'])?ApiInput::integer($body['expected_edit_version'],'expected_edit_version',1):null;unset($body['expected_edit_version']);
         $data=$method==='DELETE'?[]:$this->validate($resource,$body,$method==='POST');
         $pdo=$this->factory->connection(); $repository=new LookupRepository($pdo,$resource); $pdo->beginTransaction();
         try {
@@ -51,6 +53,7 @@ final readonly class LookupService
             if($current['must_change_password']) {throw new HttpException(403,'PASSWORD_CHANGE_REQUIRED','Change your password to continue.');}
             $before=$id===null?null:$repository->find($id,true);
             if($id!==null && !$before){throw new HttpException(404,'NOT_FOUND','Record not found.');}
+            if($before&&$expected!==null&&$expected!==(int)$before['edit_version'])throw new HttpException(409,'STALE_EDIT','This record changed. Your entries are retained; reload and review before saving.');if($before&&$before['edit_version']>=2147483647)throw new HttpException(409,'VERSION_OVERFLOW','Edit revision limit reached.');
             if($method==='DELETE') {
                 if($repository->referenced($id)){throw new HttpException(409,'REFERENCED_RECORD','Reassign every product, including archived products, before deleting this record.');}
                 $repository->delete($id); $after=null;

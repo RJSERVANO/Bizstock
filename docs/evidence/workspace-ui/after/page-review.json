@@ -1,0 +1,66 @@
+[
+  {
+    "page": "dashboard",
+    "desktop_overflow": false
+  },
+  {
+    "page": "products",
+    "desktop_overflow": false
+  },
+  {
+    "page": "products/new",
+    "desktop_overflow": false
+  },
+  {
+    "page": "products/1/edit",
+    "desktop_overflow": false
+  },
+  {
+    "page": "movements",
+    "desktop_overflow": false
+  },
+  {
+    "page": "history",
+    "desktop_overflow": false
+  },
+  {
+    "page": "categories",
+    "desktop_overflow": false
+  },
+  {
+    "page": "suppliers",
+    "desktop_overflow": false
+  },
+  {
+    "page": "reports/inventory",
+    "desktop_overflow": false
+  },
+  {
+    "page": "reports/transactions",
+    "desktop_overflow": false
+  },
+  {
+    "page": "account",
+    "desktop_overflow": false
+  },
+  {
+    "page": "users",
+    "desktop_overflow": false
+  },
+  {
+    "page": "audit-events",
+    "desktop_overflow": false
+  },
+  {
+    "page": "analytics",
+    "desktop_overflow": false
+  },
+  {
+    "page": "stock-counts",
+    "desktop_overflow": false
+  },
+  {
+    "page": "help",
+    "desktop_overflow": false
+  }
+]

@@ -12,9 +12,9 @@ final readonly class StockController
     public function handle(string $method,?int $id,string $uri): Response
     {
         $actor=$this->auth->current();Authorization::requireRole($actor,['Admin','Staff']);
-        $query=ApiInput::query(explode('?',$uri,2)[1]??'',$method==='GET'&&$id===null?['product_id','category_id','user_id','type','date_from','date_to','page','per_page','sort','direction']:[]);
+        $query=ApiInput::query(explode('?',$uri,2)[1]??'',$method==='GET'&&$id===null?['product_id','category_id','user_id','type','reason_code','date_from','date_to','page','per_page','sort','direction']:[]);
         if($method==='POST') {
-            $this->sessions->verifyCsrf();$body=ApiInput::body(['product_id','type','quantity','notes','correction_of_transaction_id']);
+            $this->sessions->verifyCsrf();$body=ApiInput::body(['product_id','type','quantity','notes','reason_code','reference_number','party_text','correction_of_transaction_id']);
             if(array_key_exists('correction_of_transaction_id',$body)){Authorization::requireRole($actor,['Admin']);}
             return Response::success((new StockMovementService($this->factory->connection()))->record($body,$actor,ApiInput::operationKey($_SERVER['HTTP_IDEMPOTENCY_KEY']??null)),[],201);
         }

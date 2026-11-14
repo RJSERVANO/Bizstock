@@ -11,9 +11,9 @@ final class Authorization
 
     public static function user(array $row): array
     {
-        $safe=array_intersect_key($row,array_flip(['user_id','full_name','username','role','is_active','must_change_password','created_at','updated_at']));
+        $safe=array_intersect_key($row,array_flip(['user_id','full_name','username','role','is_active','must_change_password','created_at','updated_at','edit_version','last_successful_login_at']));
         $safe['user_id']=(int)$safe['user_id'];
-        $safe['has_image']=!empty($row['profile_image']);
+        $safe['last_successful_login_at']=empty($row['last_successful_login_at'])?null:(new \DateTimeImmutable($row['last_successful_login_at'],new \DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.u\Z');$safe['has_image']=!empty($row['profile_image']);
         foreach (['is_active','must_change_password'] as $key) { $safe[$key]=(bool)$safe[$key]; }
         foreach (['created_at','updated_at'] as $key) { $safe[$key]=(new \DateTimeImmutable($safe[$key],new \DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.u\Z'); }
         return $safe;
@@ -22,8 +22,8 @@ final class Authorization
     public static function product(array $row, string $role): array
     {
         if (!in_array($role,['Admin','Staff','Viewer'],true)) { throw new HttpException(403,'FORBIDDEN','Access denied.'); }
-        $fields=['product_id','sku','product_name','category_id','category_name','quantity','minimum_threshold','stock_status','is_active'];
-        if ($role!=='Viewer') { $fields=array_merge($fields,['price','supplier_id','supplier_name','location','description','version','created_at','updated_at']); }
+        $fields=['product_id','sku','product_name','category_id','category_name','quantity','minimum_threshold','stock_status','is_active','unit_code'];
+        if ($role!=='Viewer') { $fields=array_merge($fields,['price','supplier_id','supplier_name','location','description','version','stock_revision','created_at','updated_at']); }
         return array_intersect_key($row,array_flip($fields))+['has_image'=>!empty($row['product_image'])];
     }
 

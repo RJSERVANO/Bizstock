@@ -6,7 +6,7 @@ use BizStock\Support\Ui;
 <table class="inventory-table<?= !empty($lookup) ? ' lookup-table' : '' ?>">
 <caption class="visually-hidden"><?= Ui::escape($caption) ?></caption>
 <thead><tr>
-<?php foreach ($columns as $key => $label): ?><th scope="col" <?= in_array($key, ['quantity', 'threshold', 'price'], true) ? 'class="numeric"' : '' ?> <?= in_array($key, ['name', 'quantity'], true) ? 'aria-sort="none"' : '' ?>><?php if (in_array($key, ['name', 'quantity'], true)): ?><button type="button" class="sort-button" data-sort="<?= Ui::escape($key) ?>"><?= Ui::escape($label) ?><span aria-hidden="true" data-sort-symbol>↕</span></button><?php else: ?><?= Ui::escape($label) ?><?php endif; ?></th><?php endforeach; ?>
+<?php foreach ($columns as $key => $label): ?><th scope="col" <?= in_array($key, ['quantity', 'threshold', 'price', 'analytics_in', 'analytics_out', 'analytics_net'], true) ? 'class="numeric"' : '' ?> <?= in_array($key, ['name', 'quantity'], true) ? 'aria-sort="none"' : '' ?>><?php if (in_array($key, ['name', 'quantity'], true)): ?><button type="button" class="sort-button" data-sort="<?= Ui::escape($key) ?>"><?= Ui::escape($label) ?><span aria-hidden="true" data-sort-symbol>↕</span></button><?php else: ?><?= Ui::escape($label) ?><?php endif; ?></th><?php endforeach; ?>
 </tr></thead>
 <tbody>
 <?php foreach ($rows as $row): ?><tr data-product-row data-name="<?= Ui::escape($row['name']) ?>" data-sku="<?= Ui::escape($row['sku']) ?>" data-category="<?= Ui::escape($row['category']) ?>" data-status="<?= Ui::escape($row['status']) ?>" data-quantity="<?= (int) $row['quantity'] ?>">

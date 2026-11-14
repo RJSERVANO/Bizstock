@@ -11,6 +11,6 @@ final readonly class ImageRepository
     }
     public function replace(bool $product,int $id,?string $filename): void {
         [$table,$key,$column]=$this->target($product);
-        $q=$this->pdo->prepare("UPDATE {$table} SET {$column}=? WHERE {$key}=?");$q->execute([$filename,$id]);
+        $revision=$product?'':',edit_version=edit_version+1';$q=$this->pdo->prepare("UPDATE {$table} SET {$column}=?{$revision} WHERE {$key}=?");$q->execute([$filename,$id]);
     }
 }

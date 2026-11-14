@@ -1,5 +1,21 @@
 # BizStock user guide
 
+## Audit Phases 3–5 — operator upgrade required
+
+The installed schema was not upgraded automatically. Review [the local upgrade runbook](phase345-upgrade.md) first. Earlier notes below describe previous checkpoints.
+
+Stale Users/category/supplier edits keep ordinary entered values and offer reload/review; reconcile explicitly. Admin Users edits still revoke sessions, including name-only edits; own-profile names keep sessions. Successful sign-in time uses Manila labels and Not recorded when unknown. Admin Restore preserves product identity/history.
+
+Choose a reason for ordinary IN/OUT. Customer return adds stock; supplier return/damage removes usable stock. Mistake correction uses an Admin reversal. References/source/recipient are optional descriptive business context, not unique keys; avoid unnecessary personal information. Old reasons/units stay Unspecified. Establish a whole base unit on new products or classify Unspecified explicitly from Details; established units cannot be casually changed. No fractions/conversions.
+
+Dashboard groups quantities by unit. Analytics retains 7/30-day shortcuts and bounded inclusive Manila dates, excludes openings/count adjustments, offsets original direction on reversal date, and uses current categories. Warnings flag excluded ambiguous old receipts; no classification is invented. CSV columns remain unchanged; Detailed JSON includes effective filters/snapshot/unit context and all matches within existing limits. Print is current page.
+
+Physical counts: Staff/Admin create drafts, select products, enter whole quantities and discrepancy reasons, then submit. Only Admin approves all lines together. Changed stock/eligibility refuses approval even after a same-balance round trip. Explicitly return to draft, physically recount and select the explicit recount option before resubmitting; quantity entry alone never refreshes an old baseline. Zero differences create no movement. Cancel only draft/submitted counts. Approved records/adjustments remain historical and linked to History. Retry uncertain approval unchanged in the same form.
+
+Phases 1–2 update (2026-11-14): Help in the sidebar provides concise instructions for your role. Product filters/sorting/page are kept in the URL through edit, save, Cancel, Back and reload; malformed state is cleared with guidance. Product Details groups availability, image and permitted information/actions; Admin/Staff may see recent movements, Viewer cannot. Categories/Suppliers link separately counted active/archived products using current assignments, not historical receipt suppliers. Unsaved lookup edits prompt before Cancel/navigation.
+
+Dashboard recent movements cover the whole business for authorized roles. A failed refresh retains visibly stale results and the last successful snapshot; retry Refresh dashboard. At/below-threshold alerts include zero, whereas low-stock status means a positive quantity at/below threshold. Movement review now shows an expected balance: this is a preview, not a reservation. Stock is checked again when saved. Reports retry preserves selected filters and the correct report. Users adds a role filter and Manila creation date; Audit supports exact action codes and escaped before/after comparisons. Scroll/focus a comparison to reach all columns. Existing password/reset/deactivation/session rules remain unchanged.
+
 Dashboard alerts now show the first five products in lowest-quantity/ID order, with zero stock first. View all alerts opens the full active low-stock inventory. Low-stock counts include zero; Total units combines active quantities and is not inventory value. Admin/Staff can choose Receive stock on an alert to open its product in IN mode; review and confirm manually. Refresh shows the last successful update. Select 7/30 days, use a day control for exact IN/OUT quantities or expand Daily activity data; on narrow screens the 30-day chart scrolls sideways.
 
 The sidebar stays anchored while the page scrolls. Scroll its navigation to reach remaining links; compact icons show keyboard/hover tooltips. Mobile navigation closes with Escape and restores focus. Use Skip to main content with the keyboard.

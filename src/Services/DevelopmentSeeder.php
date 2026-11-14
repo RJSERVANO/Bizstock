@@ -42,7 +42,7 @@ final class DevelopmentSeeder
                 foreach(['IN'=>$product['opening'],'OUT'=>$product['out']] as $type=>$quantity){
                     if($quantity===0){continue;}
                     $key='dev-seed:'.$product['sku'].':'.$type;
-                    $stock->recordInTransaction(['product_id'=>$id,'type'=>$type,'quantity'=>$quantity,'notes'=>'Development seed'.($type==='IN'?' opening stock':' stock example')],$seedActor,$key);
+                    $stock->recordInTransaction(['product_id'=>$id,'type'=>$type,'quantity'=>$quantity,'notes'=>'Development seed'.($type==='IN'?' opening stock':' stock example')],$seedActor,$key,$type==='IN'?'opening':'ordinary');
                 }
             }
             $this->pdo->exec('UPDATE users SET must_change_password=1');

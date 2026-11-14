@@ -115,7 +115,7 @@
   document.querySelector('.account-menu')?.addEventListener('keydown',event=>{if(event.key==='Escape'){event.currentTarget.open=false;event.currentTarget.querySelector('summary').focus();}});
   // All existing controls remain in the form; advanced controls use native disclosure.
   document.querySelectorAll('[data-search]').forEach(form=>{
-    form.classList.add('filter-panel');if(form.classList.contains('history-toolbar')||(document.querySelector('main').dataset.screen==='reports'&&form.elements.type))form.classList.add('filter-panel--complex');const common=new Set(['q','category_id','stock_status','is_active','type','date_from','date_to','entity_type']);
+    form.classList.add('filter-panel');if(form.classList.contains('history-toolbar')||(document.querySelector('main').dataset.screen==='reports'&&form.elements.type))form.classList.add('filter-panel--complex');const common=new Set(['q','category_id','stock_status','status','is_active','role','action','type','reason_code','period','group','date_from','date_to','entity_type']);
     const advanced=document.createElement('details'),summary=document.createElement('summary'),fields=document.createElement('div');
     advanced.className='advanced-filters';summary.textContent='More filters and sorting';fields.className='advanced-fields';advanced.append(summary,fields);
     [...form.querySelectorAll(':scope > .field')].forEach(field=>{const control=field.querySelector('input,select');if(control&&!common.has(control.name))fields.append(field);});

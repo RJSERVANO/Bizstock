@@ -8,7 +8,7 @@ use BizStock\Http\{Authorization,HttpException};
 final readonly class ProductService
 {
     public function __construct(private \PDO $pdo){}
-    public static function fields(): array{return ['sku','product_name','category_id','supplier_id','price','minimum_threshold','location','description'];}
+    public static function fields(): array{return ['sku','product_name','category_id','supplier_id','price','minimum_threshold','location','description','unit_code'];}
     public static function project(array $row,string $role): array
     {
         $row['is_active']=(bool)$row['is_active'];$row['stock_status']=$row['quantity']===0?'out_of_stock':($row['quantity']<=$row['minimum_threshold']?'low_stock':'in_stock');
@@ -21,7 +21,7 @@ final readonly class ProductService
     private function validate(array $body,bool $create): array
     {
         if(array_diff(array_keys($body),[...self::fields(),...($create?['opening_quantity']:['expected_version'])])){throw new HttpException(422,'VALIDATION_ERROR','Unknown product field; quantity cannot be edited.');}
-        $data=[];
+        $data=[];if(array_key_exists('unit_code',$body)){if(!$create)throw new HttpException(422,'VALIDATION_ERROR','Use the explicit unit classification operation.');$data['unit_code']=\BizStock\Support\BaseUnits::validate($body['unit_code']);}
         foreach(['sku'=>64,'product_name'=>150,'location'=>100,'description'=>2000] as $field=>$max){
             if(array_key_exists($field,$body)||($create&&in_array($field,['sku','product_name'],true))){$value=$body[$field]??null;$required=in_array($field,['sku','product_name'],true);$data[$field]=$value===null&&!$required?null:ApiInput::text($value,$field,$max,$required);if(!$required&&$data[$field]===''){$data[$field]=null;}}
         }
@@ -42,10 +42,18 @@ final readonly class ProductService
         return $this->map(fn()=>AtomicWrite::run($this->pdo,$actor,['Admin'],function($current)use($data,$key,$hash,$requestId){
             $ops=new OperationRepository($this->pdo);$replay=$ops->reserve((int)$current['user_id'],'product.create',$key,$hash);if($replay!==null){return $replay;}
             $this->references($data);$repo=new ProductRepository($this->pdo);$id=$repo->create($data);$movement=null;
-            if($data['opening_quantity']>0){$opening=(new StockMovementService($this->pdo))->appendInTransaction(['product_id'=>$id,'type'=>'IN','quantity'=>$data['opening_quantity'],'notes'=>'Opening stock'],$current,$key,$hash);$movement=$opening['transaction_id'];}
+            if($data['opening_quantity']>0){$opening=(new StockMovementService($this->pdo))->appendInTransaction(['product_id'=>$id,'type'=>'IN','quantity'=>$data['opening_quantity'],'notes'=>'Opening stock'],$current,$key,$hash,'opening');$movement=$opening['transaction_id'];}
             $result=$this->detail($id,'Admin');(new AuditRepository($this->pdo))->record((int)$current['user_id'],'product.created','product',$id,null,$result,$requestId);
             return $ops->complete((int)$current['user_id'],$key,$id,$movement,$result);
         }));
+    }
+    public function classify(int $id,array $body,array $actor,string $requestId):array{
+        if(array_diff(array_keys($body),['unit_code','expected_version']))throw new HttpException(422,'VALIDATION_ERROR','Supply unit and expected_version only.');$unit=\BizStock\Support\BaseUnits::validate($body['unit_code']??null);$expected=ApiInput::integer($body['expected_version']??null,'expected_version',1);if($unit==='unspecified')throw new HttpException(422,'VALIDATION_ERROR','Choose a specific integer base unit.');
+        return AtomicWrite::run($this->pdo,$actor,['Admin'],function($current)use($id,$unit,$expected,$requestId){$repo=new ProductRepository($this->pdo);$row=$repo->detail($id,true);if(!$row)throw new HttpException(404,'NOT_FOUND','Product not found.');if($row['version']!==$expected)throw new HttpException(409,'STALE_EDIT','Reload and review this product.');if($row['unit_code']!=='unspecified')throw new HttpException(409,'UNIT_IMMUTABLE','An established base unit cannot be changed.');if($row['version']>=2147483647||$row['stock_revision']>=2147483647)throw new HttpException(409,'VERSION_OVERFLOW','Product revision limit reached.');$before=self::project($row,'Admin');$repo->update($id,['unit_code'=>$unit]);$after=$this->detail($id,'Admin');(new AuditRepository($this->pdo))->record((int)$current['user_id'],'product.unit_classified','product',$id,$before,$after,$requestId);return $after;});
+    }
+    public function restore(int $id,array $body,array $actor,string $requestId):array{
+        if(array_keys($body)!==['expected_version'])throw new HttpException(422,'VALIDATION_ERROR','Supply expected_version only.');$expected=ApiInput::integer($body['expected_version'],'expected_version',1);
+        return AtomicWrite::run($this->pdo,$actor,['Admin'],function($current)use($id,$expected,$requestId){$repo=new ProductRepository($this->pdo);$row=$repo->detail($id,true);if(!$row)throw new HttpException(404,'NOT_FOUND','Product not found.');if($row['version']!==$expected||$row['is_active'])throw new HttpException(409,'STALE_EDIT','Reload and review this archived product.');if($row['version']>=2147483647||$row['stock_revision']>=2147483647)throw new HttpException(409,'VERSION_OVERFLOW','Product revision limit reached.');$this->references($row);$before=self::project($row,'Admin');$repo->update($id,['is_active'=>1]);$after=$this->detail($id,'Admin');(new AuditRepository($this->pdo))->record((int)$current['user_id'],'product.restored','product',$id,$before,$after,$requestId);return $after;});
     }
     public function mutate(int $id,string $method,array $body,array $actor,string $requestId): array
     {
@@ -54,7 +62,7 @@ final readonly class ProductService
         return $this->map(fn()=>AtomicWrite::run($this->pdo,$actor,['Admin'],function($current)use($id,$method,$data,$requestId){
             $repo=new ProductRepository($this->pdo);$row=$repo->detail($id,true);if(!$row){throw new HttpException(404,'NOT_FOUND','Product not found.');}
             if($row['version']!==$data['expected_version']){throw new HttpException(409,'STALE_EDIT','The product changed. Reload it before editing.');}
-            if($row['version']>=2147483647){throw new HttpException(409,'VERSION_OVERFLOW','Version limit exceeded.');}
+            if($row['version']>=2147483647||($method==='DELETE'&&$row['stock_revision']>=2147483647)){throw new HttpException(409,'VERSION_OVERFLOW','Version limit exceeded.');}
             $before=self::project($row,'Admin');$changes=$data;unset($changes['expected_version']);
             if($method==='DELETE'){if(!$row['is_active']||$row['quantity']!==0){throw new HttpException(409,'ARCHIVE_CONFLICT','Only active products with zero stock can be archived.');}$changes=['is_active'=>0];}
             else {if(isset($changes['sku'])&&$changes['sku']!==$row['sku']&&$repo->hasMovements($id)){throw new HttpException(409,'SKU_IMMUTABLE','SKU cannot change after a movement.');}$this->references($changes);}

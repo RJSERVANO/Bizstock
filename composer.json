@@ -65,7 +65,11 @@
     "test:homepage": "@php tests/integration/homepage.php",
     "test:usability": "@php tests/integration/usability.php",
     "test:permissions": "@php tests/integration/permissions.php",
-    "test:login-design": "@php tests/integration/login-design.php"
+    "test:login-design": "@php tests/integration/login-design.php",
+    "test:phase12": "@php tests/integration/phase12.php",
+    "test:phase3": "@php tests/integration/phase3.php",
+    "test:phase4": "@php tests/integration/phase4.php",
+    "test:phase5": "@php tests/integration/phase5.php"
   },
   "config": {
     "sort-packages": true,

@@ -17,6 +17,9 @@ try {
     elseif(($job['action']??'')==='create'){$result=(new BizStock\Services\ProductService($pdo))->create($job['body'],$actor,$job['key'],'worker-'.bin2hex(random_bytes(16)));}
     elseif(($job['action']??'')==='archive'){$result=(new BizStock\Services\ProductService($pdo))->mutate($job['product'],'DELETE',['expected_version'=>$job['version']],$actor,'worker-'.bin2hex(random_bytes(16)));}
     elseif(($job['action']??'')==='edit'){$result=(new BizStock\Services\ProductService($pdo))->mutate($job['product'],'PATCH',$job['body'],$actor,'worker-'.bin2hex(random_bytes(16)));}
+    elseif(($job['action']??'')==='restore'){$result=(new BizStock\Services\ProductService($pdo))->restore($job['product'],['expected_version'=>$job['version']],$actor,'worker-'.bin2hex(random_bytes(16)));}
+    elseif(($job['action']??'')==='count-approve'){$result=(new BizStock\Services\StockCountService($pdo))->transition($job['id'],'approve',['expected_version'=>$job['version']],$actor,$job['key'],'worker-'.bin2hex(random_bytes(16)));}
+    elseif(($job['action']??'')==='lookup'){$result=(new BizStock\Services\LookupService(new PdoFactory($config)))->mutate($job['resource'],'PATCH',$job['id'],$job['body'],$actor,'worker-'.bin2hex(random_bytes(16)));}
     else {$pdo->exec('SET SESSION innodb_lock_wait_timeout=1');$result=(new StockMovementService($pdo))->record($job['body'],$actor,$job['key']);}
     echo json_encode(['status'=>201,'result'=>$result],JSON_THROW_ON_ERROR);
 }catch(BizStock\Http\HttpException $e){echo json_encode(['status'=>$e->status,'code'=>$e->errorCode],JSON_THROW_ON_ERROR);}

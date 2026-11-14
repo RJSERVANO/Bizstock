@@ -4,6 +4,6 @@ use BizStock\Support\Ui;
 ?>
 <dialog class="bs-dialog" id="<?= Ui::escape($id) ?>" aria-labelledby="<?= Ui::escape($id) ?>-title">
 <div class="dialog-heading"><h2 id="<?= Ui::escape($id) ?>-title"><?= Ui::escape($title) ?></h2><button type="button" class="icon-button" aria-label="Close dialog" data-close-dialog><?= $ui->icon('close') ?></button></div>
-<p><?= Ui::escape($message) ?></p><p data-dialog-summary></p>
+<p><?= Ui::escape($message) ?></p><?php if($id==='detail-review'): ?><div data-dialog-summary></div><?php else: ?><p data-dialog-summary></p><?php endif; ?>
 <div class="dialog-actions"><?= $ui->component('button', ['label' => 'Close review', 'variant' => 'secondary']) ?><?php if(!empty($confirmLabel)): ?><?= $ui->component('button',['label'=>$confirmLabel,'variant'=>'danger']) ?><?php endif; ?></div>
 </dialog>

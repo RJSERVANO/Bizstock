@@ -6,7 +6,7 @@ use BizStock\Services\ImageService;
 $f=new BusinessFixture('images');
 try{
  $f->check((new StockReconciliation($f->pdo))->inspect()['discrepancies']===[],'reconciliation before');
- $f->check(count((new MigrationRunner($f->pdo,$f->config->root.'/database/migrations'))->run())===4,'safe rerun four migrations');
+ $f->check(count((new MigrationRunner($f->pdo,$f->config->root.'/database/migrations'))->run())===7,'safe rerun seven migrations');
  $id=$f->product('IMAGE-TEST');$f->serve();$admin=$f->login();$staff=$f->login(2);$viewer=$f->login(5);
  $file=$f->config->root.'/var/image-test-'.bin2hex(random_bytes(8)).'.png';$image=imagecreatetruecolor(80,60);imagepng($image,$file);unset($image);
  $upload=function(string $path,array $jar,string $bytes,string $filename='photo.png',bool $csrf=true)use($f):array{

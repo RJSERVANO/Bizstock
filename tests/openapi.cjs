@@ -11,13 +11,13 @@ walk(api);const names=new Set();
 for(const [path,item] of Object.entries(api.paths))for(const [method,op] of Object.entries(item)){
  operations++;assert(!names.has(op.operationId));names.add(op.operationId);assert(op.responses);assert(op['x-roles'].length);
  assert(['implemented','planned'].includes(op['x-implementation-status']));
- if(op['x-implementation-status']==='implemented'){implemented++;assert(['/health','/auth/csrf','/auth/login','/auth/logout','/auth/me','/account/password','/account/profile','/categories','/categories/{id}','/suppliers','/suppliers/{id}','/transactions','/transactions/{id}','/products','/products/{id}','/dashboard','/reports/inventory','/reports/transactions','/users','/users/{id}','/users/{id}/password-reset','/audit-events','/account/photo','/products/{id}/image'].includes(path));if(path==='/health'||path==='/auth/csrf')assert.deepEqual(op.security,[]);}else{
+ if(op['x-implementation-status']==='implemented'){implemented++;assert(['/health','/auth/csrf','/auth/login','/auth/logout','/auth/me','/account/password','/account/profile','/categories','/categories/{id}','/suppliers','/suppliers/{id}','/transactions','/transactions/{id}','/products','/products/{id}','/dashboard','/reports/inventory','/reports/transactions','/users','/users/{id}','/users/{id}/password-reset','/audit-events','/account/photo','/products/{id}/image','/history/actors','/products/{id}/restore','/products/{id}/unit','/analytics','/stock-counts','/stock-counts/{id}','/stock-counts/{id}/lines/{product_id}','/stock-counts/{id}/submit','/stock-counts/{id}/approve','/stock-counts/{id}/cancel','/stock-counts/{id}/return_to_draft'].includes(path));if(path==='/health'||path==='/auth/csrf')assert.deepEqual(op.security,[]);}else{
   assert(op.responses['404']);assert(op.summary.startsWith('Planned:'));
   if(['post','patch','delete'].includes(method))assert(op.security.some(s=>s.cookieSession&&s.csrfToken),'Write missing cookie/CSRF requirement');
  }
  if(path.includes('{id}'))assert(op.parameters.some(p=>p.$ref==='#/components/parameters/Id'));
 }
-assert.equal(implemented,39);assert.equal(operations,39);
+assert.equal(implemented,51);assert.equal(operations,51);
 for(const route of ['/auth/csrf','/auth/login','/auth/logout','/auth/me','/account/password','/dashboard','/products','/products/{id}','/categories','/suppliers','/transactions','/transactions/{id}','/reports/inventory','/reports/transactions','/users','/users/{id}','/users/{id}/password-reset','/audit-events'])assert(api.paths[route]);
 for(const field of ['price','supplier_id','supplier_name','location','description','user_id'])assert(!api.components.schemas.ProductAvailability.properties[field]);
 for(const route of ['/products','/transactions'])assert(api.paths[route].post.parameters.some(p=>p.$ref==='#/components/parameters/Key'));

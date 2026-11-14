@@ -6,7 +6,7 @@ final class BusinessFixture
 {
     public Config $config; public PDO $pdo; private PDO $admin; public string $password; public int $checks=0;
     private array $servers=[];public string $origin='';
-    public function __construct(public string $stage)
+    public function __construct(public string $stage,?string $through=null)
     {
         $base=require dirname(__DIR__,2).'/config/bootstrap.php';
         if(!in_array($base->environment,['local','test'],true)||!in_array($base->dbHost,['127.0.0.1','localhost','::1'],true)){throw new RuntimeException('Disposable loopback test target required.');}
@@ -17,7 +17,7 @@ final class BusinessFixture
         $make=fn($db)=>new Config($base->root,'test','/bizstock','PHP','Asia/Manila',$base->dbHost,$base->dbPort,$db,$user,$password,$base->logPath,$base->dbTarget);
         $this->admin=(new PdoFactory($make($base->dbName)))->connection();$this->admin->exec("CREATE DATABASE `{$name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
         $this->config=$make($name);$this->pdo=(new PdoFactory($this->config))->connection();
-        (new MigrationRunner($this->pdo,$base->root.'/database/migrations'))->run();$this->password=bin2hex(random_bytes(16));
+        (new MigrationRunner($this->pdo,$base->root.'/database/migrations'))->run($through);$this->password=bin2hex(random_bytes(16));
         $q=$this->pdo->prepare('INSERT INTO users(full_name,username,password_hash,role,must_change_password) VALUES (?,?,?,?,0)');
         foreach(['Admin','Staff','Staff','Admin','Viewer'] as $i=>$role){$q->execute([$role.' '.($i+1),'test'.($i+1),PasswordPolicy::hash($this->password),$role]);}
         $this->pdo->exec("INSERT INTO categories(category_name) VALUES ('General');INSERT INTO suppliers(supplier_name) VALUES ('General supplier')");

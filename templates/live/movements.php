@@ -11,7 +11,10 @@
 <?= $ui->component('field',['id'=>'quantity','label'=>'Quantity','type'=>'number','required'=>true,'min'=>1,'value'=>1,'hint'=>'Enter the number of units to move.']) ?>
 </section>
 <?php if($admin): ?><section data-reversal class="panel form-grid" hidden><?= $ui->component('field',['id'=>'original_id','label'=>'Original movement ID','type'=>'number','hint'=>'Select an original from History. Full quantity and original price are preserved.']) ?><div><button data-original type="button" class="bs-button bs-button--secondary">Load original</button></div><div data-original-summary></div></section><?php endif; ?>
-<section class="panel panel-body"><h2>Notes and reason</h2><?= $ui->component('field',['id'=>'notes','label'=>'Note / reversal reason','type'=>'textarea','hint'=>'Optional for IN/OUT. Required for reversal.']) ?></section>
+<section class="panel panel-body"><h2>Movement context</h2><div data-ordinary-context>
+<?= $ui->component('field',['id'=>'reason_code','label'=>'Movement reason','type'=>'select','required'=>true,'options'=>[''=>'Choose a reason']]) ?>
+<?= $ui->component('field',['id'=>'reference_number','label'=>'Reference number (optional)','maxlength'=>100,'hint'=>'Descriptive only, not a unique identifier or retry key.']) ?>
+<?= $ui->component('field',['id'=>'party_text','label'=>'Source / recipient (optional)','maxlength'=>150,'hint'=>'Business context only; avoid unnecessary personal details.']) ?></div><p>Real returns use ordinary IN/OUT reasons. Reversals correct mistakes. Damage/write-off removes usable stock; there is no quarantine balance.</p><?= $ui->component('field',['id'=>'notes','label'=>'Note / reversal reason','type'=>'textarea','hint'=>'Optional for IN/OUT. Required for reversal.']) ?></section>
 <div class="form-actions"><button class="bs-button bs-button--primary" type="submit">Review movement</button></div>
 </div><section class="panel availability-panel"><h2>Available stock</h2><p data-availability role="status">Select a product to load its current availability.</p><button data-availability-refresh type="button" class="bs-button bs-button--secondary">Refresh availability</button><p class="muted">Review the quantity and product before confirming. Stock is checked again when you save.</p></section></div>
 </form><a href="<?= \BizStock\Support\Ui::escape($config->url('/history')) ?>">View stock history</a>

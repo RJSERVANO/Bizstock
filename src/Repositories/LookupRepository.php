@@ -17,14 +17,15 @@ final readonly class LookupRepository
         $query=$this->pdo->prepare("SELECT * FROM {$this->resource} WHERE {$this->id}=?".($lock?' FOR UPDATE':''));
         $query->execute([$id]); return $query->fetch()?:null;
     }
-    public function listing(string $search, array $page): array
+    public function listing(string $search, array $page,bool $includeProducts=false): array
     {
         $pattern='%'.strtr($search,['!'=>'!!','%'=>'!%','_'=>'!_']).'%';
         $where=" WHERE {$this->name} LIKE ? ESCAPE '!'";
         $count=$this->pdo->prepare("SELECT COUNT(*) FROM {$this->resource}{$where}"); $count->execute([$pattern]);
         $total=(int)$count->fetchColumn();
         // page/order identifiers originate exclusively from ApiInput's trusted server map.
-        $sql="SELECT * FROM {$this->resource}{$where} ORDER BY {$page['order_by']} {$page['direction']}, {$this->id} ASC LIMIT ? OFFSET ?";
+        $counts=$includeProducts?",(SELECT COUNT(*) FROM products p WHERE p.{$this->id}={$this->resource}.{$this->id} AND p.is_active=1) AS active_product_count,(SELECT COUNT(*) FROM products p WHERE p.{$this->id}={$this->resource}.{$this->id} AND p.is_active=0) AS archived_product_count":'';
+        $sql="SELECT {$this->resource}.*{$counts} FROM {$this->resource}{$where} ORDER BY {$page['order_by']} {$page['direction']}, {$this->id} ASC LIMIT ? OFFSET ?";
         $query=$this->pdo->prepare($sql); $query->bindValue(1,$pattern); $query->bindValue(2,$page['per_page'],\PDO::PARAM_INT); $query->bindValue(3,$page['offset'],\PDO::PARAM_INT); $query->execute();
         return ['rows'=>$query->fetchAll(),'meta'=>['page'=>$page['page'],'per_page'=>$page['per_page'],'total'=>$total,'total_pages'=>(int)ceil($total/$page['per_page'])]];
     }
@@ -38,7 +39,7 @@ final readonly class LookupRepository
     {
         $columns=array_keys($data); $allowed=[$this->name]; if($this->resource==='suppliers'){$allowed[]='contact_email';}
         if(array_diff($columns,$allowed) || !$columns){throw new \InvalidArgumentException('Invalid lookup fields.');}
-        $query=$this->pdo->prepare("UPDATE {$this->resource} SET ".implode(',',array_map(static fn(string $key)=>$key.'=?',$columns))." WHERE {$this->id}=?");
+        $query=$this->pdo->prepare("UPDATE {$this->resource} SET ".implode(',',array_map(static fn(string $key)=>$key.'=?',$columns)).",edit_version=edit_version+1 WHERE {$this->id}=?");
         $query->execute([...array_values($data),$id]); return $this->find($id);
     }
     public function referenced(int $id): bool

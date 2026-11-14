@@ -52,7 +52,7 @@
 .workflow-section .eyebrow { color:var(--public-mint); }
 .workflow-steps { list-style:none; margin:0; padding:0; display:grid; gap:32px; }
 .workflow-steps li { display:flex; gap:24px; }
-.workflow-steps li > span { color:var(--public-mint); font-size:22px; font-weight:700; }
+.workflow-steps li > span { color:var(--public-mint); font-size:22px; font-weight:700; flex:0 0 2ch; white-space:nowrap; }
 .workflow-steps h3 { font-size:20px; margin:0 0 8px; }
 .workflow-steps p { margin:0; color:#d2e5e4; font-size:15px; }
 .about-panel { padding:40px; background:#f0f6f5; border-radius:20px; align-self:start; }

@@ -1,5 +1,72 @@
 # Stage 3 visual and accessibility review
 
+## Live workspace UI refinement - 2026-11-14
+
+Implemented the screenshot-driven Analytics, Help and Physical Counts refinement first, then inspected the remaining website and applied only confirmed presentation problems. Navy navigation, blue primary actions, shared tokens, existing API/client and business workflows remain. No schema/business-rule/export-contract changes, dependencies, installed login, password changes, business fixtures on the installation, deployment or push.
+
+### Main changes and files
+
+- [Analytics template](../templates/live/analytics.php) and [browser controller](../public/assets/js/pages/analytics.js): consistent Movement analytics title, useful subtitle, compact toolbar, synchronized shortcut/custom dates, a native keyboard-accessible calculation disclosure, applied-period/view/snapshot metadata, visible historical-exclusion warnings and view-specific empty states. Tables retain separate captured units and align quantities; no invented mixed-unit chart or total.
+- [Help template](../templates/live/help.php): repaired malformed nested markup and an interrupted sentence. Role-specific topic anchors, bounded reading lines, short procedures, task-relevant notes/disclosures and authorized links replace the nested paragraphs. Viewer sees availability/account guidance; Staff sees operational guidance; Admin additionally sees account administration and corrections/classification instructions.
+- [Counts template](../templates/live/stock-counts.php) and [browser controller](../public/assets/js/pages/stock-counts.js): primary New count action, accessible inline note form, opening/cancellation/completion focus, preserved create retry key/payload and recoverable inputs, compact status filters, explicit empty/filter/error states, text badges, creator/reviewer IDs, readable scrollable tables, recorded/counted/discrepancy quantities and decision-point approval/recount guidance. No directory query or API extension was added to obtain creator names.
+- [Business layout](../templates/layouts/business.php), [page title controller](../src/Http/Controllers/BusinessPageController.php), [results component](../templates/components/live-results.php), [table component](../templates/components/table.php) and [shared list client](../public/assets/js/business.js): presentation titles/subtitles, opt-in task state copy, numeric headers and a backwards-compatible loading/applied-request render hook. Existing unrelated page copy and handler contracts are retained.
+- [Workspace CSS](../public/assets/css/usability.css), [public CSS](../public/assets/css/public.css), [dashboard template](../templates/live/dashboard.php), [product form](../templates/live/product-form.php): targeted spacing/column-width refinements described below. Scoped rules preserve public/auth styling and other consumers. The forced-password form also separates its primary password action from Sign out.
+
+### Page review
+
+Responsive means actual Chrome at 360/768/1440 pixels with no horizontal **page** overflow; wide data tables retain a keyboard-focusable horizontal scrolling region. An unchanged decision means inspection found the existing structure usable; it does not assert manual accessibility certification.
+
+| Page / component | Decision | Reason and actual verification |
+|---|---|---|
+| Movement analytics | Improved | Removed duplicate methodology/gaps, synchronized dates and applied metadata, visible uncertainty, specific states. Five real-data views, shortcuts/custom/reset/refresh, delayed/failing/empty/warning fixtures, keyboard disclosure, responsive screenshots and axe. |
+| Help | Improved | Repaired malformed nesting; topic navigation, bounded task guides and role conditions. Admin/Staff/Viewer anchor/permission/axe checks and screenshots. |
+| Physical count list/create | Improved | Primary creation panel, focus, state badges, creator/review fields, compact filters and tailored states. Actual isolated creation, uncertain retry, filtered/initial empty fixtures, refresh recovery, 26-count real API pagination (25 + 1), responsive/axe. |
+| Count editor/review | Improved | Consistent headings, unit-aware numeric columns and decision-point restrictions. Draft/submitted/approved/cancelled screenshots/axe, failed-save input retention, explicit unsaved discard; existing Phase 5 stale/recount/atomic approval/lost-response regression passes. |
+| Dashboard | Improved | Unit overview touched the metric cards; separated panels and compacted per-unit values without aggregation. Responsive/axe screenshots and Stage 11 regression. |
+| Products table/cards/details/archive/restore | Unchanged | Existing view switch, composed role-safe details, guarded actions and scrollable long tables retained. Responsive/axe, Stage 9 and Phase 1-2 browser/HTTP regressions. |
+| Product create/edit | Improved | Replaced generic subtitle; orphaned unit field moved into Stock and pricing. Responsive/axe screenshots and Stage 9 validation/save regressions. |
+| Stock movements/confirmation/reversal | Improved spacing; workflow unchanged | Context controls touched; added shared-token gaps. Responsive/axe and Stage 10 confirmation/retry/correction regression. |
+| History/details | Unchanged | Existing filters, captured history, linked corrections and scrolling remain appropriate. Responsive/axe and movement/Phase 1-2 regressions. |
+| Categories/Suppliers/editors | Unchanged | Existing shared aligned controls, scoped counts and dirty-editor protection retained. Responsive/axe and Phase 1-2 conflict/dirty-state regressions. |
+| Reports/export/print | Improved layout; contracts unchanged | Removed inherited action-row top gap and widened transaction product columns to prevent very tall wrapped rows. Responsive/axe; Stage 12 actual filter/CSV/print/export regression, Phase 4 detailed JSON download. |
+| Your account | Unchanged | Existing separate profile/photo/security sections and placeholders remain appropriate. Responsive/axe, real isolated role account/header checks in homepage regression. |
+| Users/dialogs | Unchanged | Existing form hierarchy, conflict retention and destructive/reset separation retained. Responsive/axe and Phase 1-2 conflict/return/state regression. |
+| Audit/details | Improved filter spacing; details unchanged | Removed inherited action-row gap; retained escaped comparison details. Responsive/axe and Phase 1-2 actor/action/detail regression. |
+| Public homepage | Improved | Workflow numbers wrapped onto two lines at tablet width; prevented shrinking/wrapping. Three-width screenshots/axe and separate homepage/navigation/login regression. |
+| Login | Unchanged | Existing illustration/form hierarchy and mobile form priority retained. Three-width screenshots/axe and homepage login/navigation regression. |
+| Forced password change | Improved action spacing | Primary and Sign out buttons touched; added scoped separation. Isolated forced account, three-width screenshots and axe; no installed login/password mutation. |
+| Header/sidebar/mobile navigation/alerts/dialogs/pagination | Structure unchanged | Existing shared branding/focus/rail/drawer controls retained; affected consumers checked. Responsive/axe, homepage rail/drawer/role/header checks, count focus/retry/dirty guard and real pagination tests. |
+
+### Executed checks
+
+Selected PHP **8.5.11** and real explicit **MariaDB 10.4.32 local-only**, with randomized disposable schemas for every mutation fixture. Commands and observed results:
+
+| Command (selected PHP unless stated) | Observed result |
+|---|---|
+| `C:/ProgramData/ComposerSetup/bin/composer.phar validate --strict` | PASS |
+| same Composer `check` | PASS: 154 syntax files, 139 foundation, 14 engine-policy, 64 API assertions |
+| `tests/integration/workspace-ui.php` | PASS: 208 Chrome assertions including 33 clean axe scans |
+| `tests/integration/phase4.php` | PASS: 24 DB/HTTP/harness + 8 Chrome assertions |
+| `tests/integration/phase5.php` | PASS: 40 DB/HTTP/harness + 17 Chrome assertions |
+| `tests/integration/stage9.php` | PASS: 43 product DB + 21 Chrome assertions |
+| `tests/integration/stage10.php` | PASS: 4 movement DB + 28 Chrome assertions |
+| `tests/integration/stage11.php` | PASS: 13 dashboard DB + 16 Chrome assertions |
+| `tests/integration/stage12.php` | PASS: 43 report DB/export + 30 Chrome assertions |
+| `tests/integration/phase12.php` | PASS: 38 DB/HTTP/harness + 68 Chrome/accessibility assertions |
+| `tests/integration/homepage.php` | PASS: 28 HTTP/MariaDB + 68 Chrome assertions, 18 clean axe scans |
+| Read-only installed `bin/check-schema.php` / `bin/reconcile-stock.php` | PASS: seven applied, no pending; three products, no discrepancy |
+| Private read-only installed before/after preservation | PASS: every installed table hash and protected configuration/credential/upload/migration file hash unchanged |
+
+Early failing checks were not passes: the new Custom dates option initially selected itself/reset to blank; explicit default selection repaired it. An old exact-label check caught the added required-label text; stable labels/native required validation were retained. An old count assertion raced against the new empty-lines row; it now waits for the actual saved captured-unit row. Corrected suites passed without weakening business assertions. Generated historical homepage test artifacts were copied to the new evidence folder and their pre-run bytes restored; unrelated working-tree/application files were preserved.
+
+### Evidence and limits
+
+- [Before/after comparison viewer](evidence/workspace-ui/index.html), [sanitized verification and screenshot hashes](evidence/workspace-ui/verification.json), [browser/axe results](testing/workspace-ui-results.json). Captures use fixture accounts/data, not installed business records. Original captures: 28 before images; refreshed after states and separately retained homepage regression captures accompany them. Priority pages have paired 360/768/1440 captures; wider pages have desktop before and responsive after captures. The unchanged forced-password structure had no original before screenshot; current after captures show its targeted spacing improvement.
+- Automated axe does not establish manual screen-reader/participant acceptance. **Native browser zoom was not performed**; viewport resizing and CSS/device scaling are not presented as native zoom evidence. MySQL 8.4, production/hosting and representative-volume performance were not verified here.
+- The installed application was left running. All mutations/login/password-reset tests were isolated; no installed records, credentials, uploads, migration history or stock were changed by this task. No new feature or schema work was included.
+
+Earlier Stage 3 and subsequent checkpoints below are retained as history.
+
 Current live refinement evidence (2026-10-12): see [review and changes](ui-refinement.md) and [before/after screenshots](visual/refinement/index.html). The new local review passes 152 assertions/111 axe scans and captures all twelve business/account screens at 360/768/1440px, including real empty lists and explicit loading/error injection. Cross-role review covers 21 permitted screens. Earlier sections remain historical checkpoints; participant/manual assistive-technology and production verification stay pending.
 
 Reviewed 2026-10-11 (Asia/Manila), against blueprint section 4. **Stage 3 checkpoint passed** for the implemented development fixture screens, with no material defect found in the final review. This is not a release accessibility certification or a claim that the business application is implemented.

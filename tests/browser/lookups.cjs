@@ -43,6 +43,7 @@ const assert = require('assert/strict');
     await page.locator('[data-form-errors]').waitFor({state:'visible'});check((await page.locator('[data-form-errors]').textContent()).includes('already exists'),'duplicate form error');
     check(await page.locator('[data-form-errors]').evaluate(el=>el===document.activeElement),'form error focus');
     await page.getByRole('button',{name:'Cancel',exact:true}).click();
+    await page.locator('#unsaved-review').waitFor({state:'visible'});check(true,'dirty lookup cancel requires discard');await page.getByRole('button',{name:'Discard changes',exact:true}).click();await page.locator('[data-editor]').waitFor({state:'hidden'});
     await page.route('**/api/v1/categories?**',async route=>{await new Promise(r=>setTimeout(r,500));await route.continue();});
     await page.getByRole('button',{name:'Refresh',exact:true}).click();check(await page.locator('[data-loading]').isVisible(),'actual loading state');await page.locator('[data-loading]').waitFor({state:'hidden'});await page.unrouteAll();
     await page.route('**/api/v1/categories?**',route=>route.abort());await page.getByRole('button',{name:'Refresh',exact:true}).click();await page.locator('[data-error]').waitFor({state:'visible'});check(await page.locator('[data-error]').isVisible(),'network error state');await page.unrouteAll();

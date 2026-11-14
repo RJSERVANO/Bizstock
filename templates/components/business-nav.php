@@ -6,5 +6,7 @@
 <a class="nav-link" href="<?= Ui::escape($config->url('/categories')) ?>"><?= $ui->icon('lookup') ?>Categories</a>
 <?php if($user['role']!=='Viewer'): ?><a class="nav-link" href="<?= Ui::escape($config->url('/reports/inventory')) ?>"><?= $ui->icon('report') ?>Reports</a><?php endif; ?>
 <?php if($user['role']!=='Viewer'): ?><a class="nav-link" href="<?= Ui::escape($config->url('/suppliers')) ?>"><?= $ui->icon('box') ?>Suppliers</a><?php endif; ?>
+<?php if($user['role']!=='Viewer'): ?><a class="nav-link" href="<?= Ui::escape($config->url('/analytics')) ?>"><?= $ui->icon('report') ?>Movement analytics</a><a class="nav-link" href="<?= Ui::escape($config->url('/stock-counts')) ?>"><?= $ui->icon('history') ?>Physical counts</a><?php endif; ?>
 <a class="nav-link" href="<?= Ui::escape($config->url('/account')) ?>"><?= $ui->icon('user') ?>Your account</a>
+<a class="nav-link" href="<?= Ui::escape($config->url('/help')) ?>"><?= $ui->icon('report') ?>Help</a>
 <p class="nav-section-label">Workspace</p><?php if($user['role']==='Admin'): ?><a class="nav-link" href="<?= Ui::escape($config->url('/users')) ?>"><?= $ui->icon('users') ?>Users</a><a class="nav-link" href="<?= Ui::escape($config->url('/audit-events')) ?>"><?= $ui->icon('audit') ?>Audit log</a><?php endif; ?>

@@ -3,7 +3,7 @@
   "info": {
     "title": "BizStock API",
     "version": "1.0.0",
-    "description": "39 operations implemented on local MariaDB through the authorized UI/profile extension: authentication, lookups, products, movements/history, dashboard, reports/CSV and Admin accounts/reset/audit and secure private profile/product images. All documented operations implemented. No simulated business success. JSON writes max 65536 bytes; queries 4096 bytes. Incoming request IDs ignored. MySQL 8.4 and production HTTPS verification pending."
+    "description": "51 operations implemented on local MariaDB through audit Phases 3–5 (requires migrations 005–007; installed upgrade is a separate operator action): authentication, lookups, products, movements/history, dashboard, reports/CSV and Admin accounts/reset/audit secure private images, integer units, context/restoration/edit revisions, operational analytics and physical counts. All documented operations implemented and tested on disposable MariaDB fixtures. No simulated business success. JSON writes max 65536 bytes; queries 4096 bytes. Incoming request IDs ignored. MySQL 8.4 and production HTTPS verification pending."
   },
   "servers": [
     {
@@ -1786,6 +1786,24 @@
               "type": "string",
               "maxLength": 100
             }
+          },
+          {
+            "name": "include_edit_version",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "description": "Optional additive presence flag. Legacy immutable product-create replays retain their original payload; missing means no image information."
+            },
+            "description": "Admin-only opt-in edit_version; Viewer/Staff requesting true get 403."
+          },
+          {
+            "name": "include_products",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "description": "Optional additive presence flag. Legacy immutable product-create replays retain their original payload; missing means no image information."
+            },
+            "description": "Opt-in current-assignment active_product_count and archived_product_count; no historical receipt attribution."
           }
         ]
       },
@@ -2025,6 +2043,12 @@
                     "type": "string",
                     "maxLength": 100,
                     "minLength": 1
+                  },
+                  "expected_edit_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2147483647,
+                    "description": "Optional legacy transition. Updated first-party edits require the loaded revision; stale 409 STALE_EDIT. Omission preserves legacy last-writer behavior."
                   }
                 },
                 "required": [],
@@ -2289,6 +2313,24 @@
               "type": "string",
               "maxLength": 100
             }
+          },
+          {
+            "name": "include_edit_version",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "description": "Optional additive presence flag. Legacy immutable product-create replays retain their original payload; missing means no image information."
+            },
+            "description": "Admin-only opt-in edit_version; Viewer/Staff requesting true get 403."
+          },
+          {
+            "name": "include_products",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "description": "Optional additive presence flag. Legacy immutable product-create replays retain their original payload; missing means no image information."
+            },
+            "description": "Opt-in current-assignment active_product_count and archived_product_count; no historical receipt attribution."
           }
         ]
       },
@@ -2544,6 +2586,12 @@
                       }
                     ],
                     "description": "Trim input before validation. Null/blank clears email; omitted PATCH retains it."
+                  },
+                  "expected_edit_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2147483647,
+                    "description": "Optional legacy transition. Updated first-party edits require the loaded revision; stale 409 STALE_EDIT. Omission preserves legacy last-writer behavior."
                   }
                 },
                 "required": [],
@@ -2831,6 +2879,15 @@
             }
           },
           {
+            "name": "reason_code",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "description": "Exact controlled ordinary movement reason; historical null reasons remain unspecified."
+          },
+          {
             "name": "type",
             "in": "query",
             "schema": {
@@ -3102,7 +3159,7 @@
             "cookieSession": []
           }
         ],
-        "description": "Shared normalized filters for JSON/CSV; PHP decimal strings and UTC timestamps, Manila date boundaries. CSV UTF-8 text/csv with attachment headers, escaping/quoting and formula neutralization for text. Maximum 10,000 CSV rows and 16 MiB, over-limit 422 (never silently truncate); CSV exports all matching pages in a new consistent snapshot, X-Snapshot-At header. Inventory active only; transaction reference total includes all filtered originals/reversals. Reference unit values never revenue/profit/valuation. Viewer denied.",
+        "description": "Shared normalized filters for JSON/CSV; PHP decimal strings and UTC timestamps, Manila date boundaries. CSV UTF-8 text/csv with attachment headers, escaping/quoting and formula neutralization for text. Maximum 10,000 CSV rows and 16 MiB, over-limit 422 (never silently truncate); CSV exports all matching pages in a new consistent snapshot, X-Snapshot-At header. Inventory active only; transaction reference total includes all filtered originals/reversals. Reference unit values never revenue/profit/valuation. Viewer denied. Explicit format=detailed_json downloads the versioned context envelope with all matching items (same row/byte limits). Legacy CSV columns and order unchanged. Screen/print show units; historical null units are not inferred.",
         "responses": {
           "200": {
             "description": "Implemented against real database accounts and server sessions.",
@@ -3148,19 +3205,99 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/InventoryReport"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/InventoryReport"
+                        },
+                        "meta": {
+                          "$ref": "#/components/schemas/Pagination"
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "meta"
+                      ]
                     },
-                    "meta": {
-                      "$ref": "#/components/schemas/Pagination"
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "schema": {
+                              "type": "string",
+                              "enum": [
+                                "bizstock.report.v2"
+                              ]
+                            },
+                            "report": {
+                              "type": "string",
+                              "enum": [
+                                "inventory"
+                              ]
+                            },
+                            "filters": {
+                              "type": "object"
+                            },
+                            "snapshot_at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "Z$",
+                              "example": "2026-10-11T01:02:03.123456Z"
+                            },
+                            "timezone": {
+                              "type": "string",
+                              "enum": [
+                                "Asia/Manila"
+                              ]
+                            },
+                            "timestamp_encoding": {
+                              "type": "string",
+                              "maxLength": 50
+                            },
+                            "unit_meaning": {
+                              "type": "string",
+                              "maxLength": 500
+                            },
+                            "scope": {
+                              "type": "string",
+                              "maxLength": 100
+                            },
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/ProductDetail"
+                              }
+                            }
+                          },
+                          "required": [
+                            "schema",
+                            "report",
+                            "filters",
+                            "snapshot_at",
+                            "timezone",
+                            "timestamp_encoding",
+                            "unit_meaning",
+                            "scope",
+                            "items"
+                          ]
+                        },
+                        "meta": {
+                          "type": "object",
+                          "additionalProperties": true
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "meta"
+                      ]
                     }
-                  },
-                  "required": [
-                    "data",
-                    "meta"
                   ]
                 }
               },
@@ -3326,7 +3463,7 @@
             "cookieSession": []
           }
         ],
-        "description": "Shared normalized filters for JSON/CSV; PHP decimal strings and UTC timestamps, Manila date boundaries. CSV UTF-8 text/csv with attachment headers, escaping/quoting and formula neutralization for text. Maximum 10,000 CSV rows and 16 MiB, over-limit 422 (never silently truncate); CSV exports all matching pages in a new consistent snapshot, X-Snapshot-At header. Inventory active only; transaction reference total includes all filtered originals/reversals. Reference unit values never revenue/profit/valuation. Viewer denied.",
+        "description": "Shared normalized filters for JSON/CSV; PHP decimal strings and UTC timestamps, Manila date boundaries. CSV UTF-8 text/csv with attachment headers, escaping/quoting and formula neutralization for text. Maximum 10,000 CSV rows and 16 MiB, over-limit 422 (never silently truncate); CSV exports all matching pages in a new consistent snapshot, X-Snapshot-At header. Inventory active only; transaction reference total includes all filtered originals/reversals. Reference unit values never revenue/profit/valuation. Viewer denied. Explicit format=detailed_json downloads the versioned context envelope with all matching items (same row/byte limits). Legacy CSV columns and order unchanged. Screen/print show units; historical null units are not inferred.",
         "responses": {
           "200": {
             "description": "Implemented against real database accounts and server sessions.",
@@ -3372,19 +3509,99 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/TransactionReport"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/TransactionReport"
+                        },
+                        "meta": {
+                          "$ref": "#/components/schemas/Pagination"
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "meta"
+                      ]
                     },
-                    "meta": {
-                      "$ref": "#/components/schemas/Pagination"
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "schema": {
+                              "type": "string",
+                              "enum": [
+                                "bizstock.report.v2"
+                              ]
+                            },
+                            "report": {
+                              "type": "string",
+                              "enum": [
+                                "transactions"
+                              ]
+                            },
+                            "filters": {
+                              "type": "object"
+                            },
+                            "snapshot_at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "Z$",
+                              "example": "2026-10-11T01:02:03.123456Z"
+                            },
+                            "timezone": {
+                              "type": "string",
+                              "enum": [
+                                "Asia/Manila"
+                              ]
+                            },
+                            "timestamp_encoding": {
+                              "type": "string",
+                              "maxLength": 50
+                            },
+                            "unit_meaning": {
+                              "type": "string",
+                              "maxLength": 500
+                            },
+                            "scope": {
+                              "type": "string",
+                              "maxLength": 100
+                            },
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/Transaction"
+                              }
+                            }
+                          },
+                          "required": [
+                            "schema",
+                            "report",
+                            "filters",
+                            "snapshot_at",
+                            "timezone",
+                            "timestamp_encoding",
+                            "unit_meaning",
+                            "scope",
+                            "items"
+                          ]
+                        },
+                        "meta": {
+                          "type": "object",
+                          "additionalProperties": true
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "meta"
+                      ]
                     }
-                  },
-                  "required": [
-                    "data",
-                    "meta"
                   ]
                 }
               },
@@ -3486,6 +3703,15 @@
               "minimum": 1,
               "maximum": 2147483647
             }
+          },
+          {
+            "name": "reason_code",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "description": "Exact controlled ordinary movement reason; historical null reasons remain unspecified."
           },
           {
             "name": "type",
@@ -3653,6 +3879,18 @@
             "schema": {
               "type": "boolean",
               "description": "Optional additive presence flag. Legacy immutable product-create replays retain their original payload; missing means no image information."
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Admin",
+                "Staff",
+                "Viewer"
+              ]
             }
           }
         ]
@@ -3999,7 +4237,26 @@
           {
             "$ref": "#/components/parameters/Id"
           }
-        ]
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "expected_edit_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2147483647
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        }
       }
     },
     "/users/{id}/password-reset": {
@@ -4275,6 +4532,17 @@
               "minimum": 1,
               "maximum": 2147483647
             }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 60,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9._-]+$"
+            },
+            "description": "Exact action code. Actor display name is returned with each authorized event; nullable for system events."
           },
           {
             "$ref": "#/components/parameters/From"
@@ -5017,6 +5285,1620 @@
           }
         ]
       }
+    },
+    "/history/actors": {
+      "get": {
+        "operationId": "historyActors",
+        "summary": "Implemented: historyActors",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin",
+          "Staff"
+        ],
+        "security": [
+          {
+            "cookieSession": []
+          }
+        ],
+        "description": "Bounded historical actors only, including inactive users with movements. No username, role, email or directory access. Viewer denied.",
+        "responses": {
+          "200": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "user_id": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 2147483647
+                          },
+                          "full_name": {
+                            "type": "string",
+                            "maxLength": 100
+                          }
+                        },
+                        "required": [
+                          "user_id",
+                          "full_name"
+                        ]
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "full_name",
+                "user_id"
+              ],
+              "default": "full_name"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Direction"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ]
+      }
+    },
+    "/products/{id}/restore": {
+      "post": {
+        "operationId": "restoreProduct",
+        "summary": "Implemented: restoreProduct",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin"
+        ],
+        "security": [
+          {
+            "cookieSession": [],
+            "csrfToken": []
+          }
+        ],
+        "description": "Expected product version, locked archived product, reference validation and atomic audit; identity/history/image preserved.",
+        "responses": {
+          "200": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDetail"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Archive"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{id}/unit": {
+      "patch": {
+        "operationId": "classifyUnit",
+        "summary": "Implemented: classifyUnit",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin"
+        ],
+        "security": [
+          {
+            "cookieSession": [],
+            "csrfToken": []
+          }
+        ],
+        "description": "Explicit audited classification from unspecified to specific only. Established base unit immutable. Advances eligibility/stock revision. Never relabels historical movements.",
+        "responses": {
+          "200": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductDetail"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "expected_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2147483647
+                  },
+                  "unit_code": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "piece",
+                      "box",
+                      "kg",
+                      "litre",
+                      "metre",
+                      "pair",
+                      "set"
+                    ]
+                  }
+                },
+                "required": [
+                  "expected_version",
+                  "unit_code"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analytics": {
+      "get": {
+        "operationId": "movementAnalytics",
+        "summary": "Implemented: movementAnalytics",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin",
+          "Staff"
+        ],
+        "security": [
+          {
+            "cookieSession": []
+          }
+        ],
+        "description": "Both custom dates required together, at most 366 inclusive Manila days. Excludes openings/physical-count adjustments. Reversals offset original direction at recorded reversal time, including cross-period negative effects. Current-category assignment; captured unit groups preserved. Top ranks each product by net OUT, unit unspecified when its history includes mixed/unknown contexts. No-movement means no qualifying event, not zero net activity; excludes products created after period end and products with ambiguous legacy IN events. Unclassified legacy receipts without trusted creation links are excluded from operational summaries and reported as unclassified_events, never guessed from notes.",
+        "responses": {
+          "200": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": true
+                          }
+                        },
+                        "snapshot_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "Z$",
+                          "example": "2026-10-11T01:02:03.123456Z"
+                        },
+                        "filters": {
+                          "type": "object"
+                        },
+                        "timezone": {
+                          "type": "string",
+                          "enum": [
+                            "Asia/Manila"
+                          ]
+                        },
+                        "unclassified_events": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 2147483647
+                        },
+                        "definition": {
+                          "type": "string",
+                          "maxLength": 1000
+                        }
+                      },
+                      "required": [
+                        "items",
+                        "snapshot_at",
+                        "filters",
+                        "timezone",
+                        "unclassified_events",
+                        "definition"
+                      ]
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/From"
+          },
+          {
+            "$ref": "#/components/parameters/To"
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "7",
+                "30"
+              ]
+            }
+          },
+          {
+            "name": "group",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "top",
+                "product",
+                "category",
+                "inactive",
+                "unit"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/stock-counts": {
+      "get": {
+        "operationId": "stockCounts",
+        "summary": "Implemented: stockCounts",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin",
+          "Staff"
+        ],
+        "security": [
+          {
+            "cookieSession": []
+          }
+        ],
+        "description": "Implemented database-backed operation.",
+        "responses": {
+          "200": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StockCount"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "count_id",
+                "created_at"
+              ],
+              "default": "count_id"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Direction"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "submitted",
+                "approved",
+                "cancelled"
+              ]
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createStockCount",
+        "summary": "Implemented: createStockCount",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin",
+          "Staff"
+        ],
+        "security": [
+          {
+            "cookieSession": [],
+            "csrfToken": []
+          }
+        ],
+        "description": "Durable actor-scoped creation key; no installed-demo data.",
+        "responses": {
+          "201": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/StockCount"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Key"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "note": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "nullable": true
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stock-counts/{id}": {
+      "get": {
+        "operationId": "stockCount",
+        "summary": "Implemented: stockCount",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin",
+          "Staff"
+        ],
+        "security": [
+          {
+            "cookieSession": []
+          }
+        ],
+        "description": "Implemented database-backed operation.",
+        "responses": {
+          "200": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/StockCount"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      }
+    },
+    "/stock-counts/{id}/lines/{product_id}": {
+      "patch": {
+        "operationId": "saveCountLine",
+        "summary": "Implemented: saveCountLine",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin",
+          "Staff"
+        ],
+        "security": [
+          {
+            "cookieSession": [],
+            "csrfToken": []
+          }
+        ],
+        "description": "Draft only, at most 100 products. First entry and explicit recount require expected_stock_revision matching a locked active product. Ordinary line edits retain the old baseline. Nonzero discrepancy requires a reason. Atomic audit/count-version increment.",
+        "responses": {
+          "200": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/StockCount"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          },
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountLineWrite"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stock-counts/{id}/submit": {
+      "post": {
+        "operationId": "count_submit",
+        "summary": "Implemented: count_submit",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin",
+          "Staff"
+        ],
+        "security": [
+          {
+            "cookieSession": [],
+            "csrfToken": []
+          }
+        ],
+        "description": "Explicit audited state transition. Approval requires submitted state, locks all products in ID order and validates stock revision/unit/eligibility. All adjustments/state/audit/replay commit together. Zero discrepancy creates no movement. Changed baseline returns COUNT_STALE; explicit return to draft and recount required. Approval retries retain original key/payload.",
+        "responses": {
+          "200": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/StockCount"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountVersion"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stock-counts/{id}/approve": {
+      "post": {
+        "operationId": "count_approve",
+        "summary": "Implemented: count_approve",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin"
+        ],
+        "security": [
+          {
+            "cookieSession": [],
+            "csrfToken": []
+          }
+        ],
+        "description": "Explicit audited state transition. Approval requires submitted state, locks all products in ID order and validates stock revision/unit/eligibility. All adjustments/state/audit/replay commit together. Zero discrepancy creates no movement. Changed baseline returns COUNT_STALE; explicit return to draft and recount required. Approval retries retain original key/payload.",
+        "responses": {
+          "201": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/StockCount"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          },
+          {
+            "$ref": "#/components/parameters/Key"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountVersion"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stock-counts/{id}/cancel": {
+      "post": {
+        "operationId": "count_cancel",
+        "summary": "Implemented: count_cancel",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin",
+          "Staff"
+        ],
+        "security": [
+          {
+            "cookieSession": [],
+            "csrfToken": []
+          }
+        ],
+        "description": "Explicit audited state transition. Approval requires submitted state, locks all products in ID order and validates stock revision/unit/eligibility. All adjustments/state/audit/replay commit together. Zero discrepancy creates no movement. Changed baseline returns COUNT_STALE; explicit return to draft and recount required. Approval retries retain original key/payload.",
+        "responses": {
+          "200": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/StockCount"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountVersion"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stock-counts/{id}/return_to_draft": {
+      "post": {
+        "operationId": "count_return_to_draft",
+        "summary": "Implemented: count_return_to_draft",
+        "x-implementation-status": "implemented",
+        "x-roles": [
+          "Admin",
+          "Staff"
+        ],
+        "security": [
+          {
+            "cookieSession": [],
+            "csrfToken": []
+          }
+        ],
+        "description": "Explicit audited state transition. Approval requires submitted state, locks all products in ID order and validates stock revision/unit/eligibility. All adjustments/state/audit/replay commit together. Zero discrepancy creates no movement. Changed baseline returns COUNT_STALE; explicit return to draft and recount required. Approval retries retain original key/payload.",
+        "responses": {
+          "200": {
+            "description": "Implemented against real database accounts and server sessions.",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestId"
+                },
+                "description": "Server-generated; incoming identifiers are ignored."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "nosniff"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/StockCount"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "414": {
+            "$ref": "#/components/responses/Error414"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountVersion"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5185,6 +7067,18 @@
             "format": "date-time",
             "pattern": "Z$",
             "example": "2026-10-11T01:02:03.123456Z"
+          },
+          "edit_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "last_successful_login_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$",
+            "example": "2026-10-11T01:02:03.123456Z",
+            "nullable": true
           }
         },
         "required": [
@@ -5267,6 +7161,12 @@
             "maxLength": 72,
             "writeOnly": true,
             "description": "12–72 UTF-8 bytes, no NUL; byte bounds validated on server. Never returned or logged."
+          },
+          "expected_edit_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647,
+            "description": "Optional legacy transition. Updated first-party edits require the loaded revision; stale 409 STALE_EDIT. Omission preserves legacy last-writer behavior."
           }
         },
         "required": [
@@ -5333,6 +7233,12 @@
           "is_active": {
             "type": "boolean",
             "description": "Optional additive presence flag. Legacy immutable product-create replays retain their original payload; missing means no image information."
+          },
+          "expected_edit_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647,
+            "description": "Optional legacy transition. Updated first-party edits require the loaded revision; stale 409 STALE_EDIT. Omission preserves legacy last-writer behavior."
           }
         },
         "required": [],
@@ -5350,6 +7256,21 @@
           "category_name": {
             "type": "string",
             "maxLength": 100
+          },
+          "active_product_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "archived_product_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "edit_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
           }
         },
         "required": [
@@ -5365,6 +7286,12 @@
             "type": "string",
             "maxLength": 100,
             "minLength": 1
+          },
+          "expected_edit_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647,
+            "description": "Optional legacy transition. Updated first-party edits require the loaded revision; stale 409 STALE_EDIT. Omission preserves legacy last-writer behavior."
           }
         },
         "required": [
@@ -5395,6 +7322,21 @@
             "format": "date-time",
             "pattern": "Z$",
             "example": "2026-10-11T01:02:03.123456Z"
+          },
+          "active_product_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "archived_product_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "edit_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
           }
         },
         "required": [
@@ -5428,6 +7370,12 @@
               }
             ],
             "description": "Trim input before validation. Null/blank clears email; omitted PATCH retains it."
+          },
+          "expected_edit_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647,
+            "description": "Optional legacy transition. Updated first-party edits require the loaded revision; stale 409 STALE_EDIT. Omission preserves legacy last-writer behavior."
           }
         },
         "required": [
@@ -5472,6 +7420,30 @@
           "notes": {
             "type": "string",
             "maxLength": 2000,
+            "nullable": true
+          },
+          "reason_code": {
+            "type": "string",
+            "enum": [
+              "purchase_receipt",
+              "customer_return",
+              "other_receipt",
+              "sale_release",
+              "supplier_return",
+              "damage_writeoff",
+              "internal_use",
+              "other_release"
+            ],
+            "description": "Required by updated ordinary forms. Legacy omission remains valid; absent keys do not change historical fingerprints. Direction validated on server."
+          },
+          "reference_number": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "party_text": {
+            "type": "string",
+            "maxLength": 150,
             "nullable": true
           }
         },
@@ -5572,6 +7544,51 @@
             "minimum": 1,
             "maximum": 2147483647,
             "nullable": true
+          },
+          "reason_code": {
+            "type": "string",
+            "maxLength": 32,
+            "nullable": true
+          },
+          "reference_number": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "party_text": {
+            "type": "string",
+            "maxLength": 150,
+            "nullable": true
+          },
+          "movement_kind": {
+            "type": "string",
+            "enum": [
+              "ordinary",
+              "opening",
+              "reversal",
+              "adjustment"
+            ],
+            "nullable": true
+          },
+          "unit_code": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "piece",
+              "box",
+              "kg",
+              "litre",
+              "metre",
+              "pair",
+              "set"
+            ],
+            "nullable": true
+          },
+          "count_id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647,
+            "nullable": true
           }
         },
         "required": [
@@ -5614,14 +7631,50 @@
             "nullable": true
           },
           "before": {
-            "type": "object",
-            "nullable": true,
-            "additionalProperties": true
+            "oneOf": [
+              {
+                "type": "object",
+                "nullable": true,
+                "additionalProperties": true
+              },
+              {
+                "type": "array",
+                "items": {}
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ],
+            "description": "Safe event values; legacy JSON shapes retained. Current producers use explicit safe projections and exclude credentials."
           },
           "after": {
-            "type": "object",
-            "nullable": true,
-            "additionalProperties": true
+            "oneOf": [
+              {
+                "type": "object",
+                "nullable": true,
+                "additionalProperties": true
+              },
+              {
+                "type": "array",
+                "items": {}
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ],
+            "description": "Safe event values; legacy JSON shapes retained. Current producers use explicit safe projections and exclude credentials."
           },
           "occurred_at": {
             "type": "string",
@@ -5632,6 +7685,11 @@
           "request_id": {
             "type": "string",
             "maxLength": 128
+          },
+          "actor_name": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
           }
         },
         "required": [
@@ -5724,6 +7782,51 @@
               "quantity",
               "version"
             ]
+          },
+          "reason_code": {
+            "type": "string",
+            "maxLength": 32,
+            "nullable": true
+          },
+          "reference_number": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "party_text": {
+            "type": "string",
+            "maxLength": 150,
+            "nullable": true
+          },
+          "movement_kind": {
+            "type": "string",
+            "enum": [
+              "ordinary",
+              "opening",
+              "reversal",
+              "adjustment"
+            ],
+            "nullable": true
+          },
+          "unit_code": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "piece",
+              "box",
+              "kg",
+              "litre",
+              "metre",
+              "pair",
+              "set"
+            ],
+            "nullable": true
+          },
+          "count_id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647,
+            "nullable": true
           }
         },
         "required": [
@@ -5790,6 +7893,19 @@
           "is_active": {
             "type": "boolean",
             "description": "Optional additive presence flag. Legacy immutable product-create replays retain their original payload; missing means no image information."
+          },
+          "unit_code": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "piece",
+              "box",
+              "kg",
+              "litre",
+              "metre",
+              "pair",
+              "set"
+            ]
           }
         },
         "required": [
@@ -5896,6 +8012,24 @@
             "format": "date-time",
             "pattern": "Z$",
             "example": "2026-10-11T01:02:03.123456Z"
+          },
+          "unit_code": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "piece",
+              "box",
+              "kg",
+              "litre",
+              "metre",
+              "pair",
+              "set"
+            ]
+          },
+          "stock_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
           }
         },
         "required": [
@@ -5965,6 +8099,19 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 2147483647
+          },
+          "unit_code": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "piece",
+              "box",
+              "kg",
+              "litre",
+              "metre",
+              "pair",
+              "set"
+            ]
           }
         },
         "required": [
@@ -6041,7 +8188,9 @@
           },
           "total_units": {
             "type": "string",
-            "pattern": "^[0-9]+$"
+            "pattern": "^[0-9]+$",
+            "deprecated": true,
+            "description": "Legacy raw mixed-quantity compatibility field only; use quantity_by_unit. Not a meaningful mixed-unit business total."
           },
           "low_stock_products": {
             "type": "integer",
@@ -6064,6 +8213,36 @@
             "format": "date-time",
             "pattern": "Z$",
             "example": "2026-10-11T01:02:03.123456Z"
+          },
+          "quantity_by_unit": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "unit_code": {
+                  "type": "string",
+                  "enum": [
+                    "unspecified",
+                    "piece",
+                    "box",
+                    "kg",
+                    "litre",
+                    "metre",
+                    "pair",
+                    "set"
+                  ]
+                },
+                "quantity": {
+                  "type": "string",
+                  "pattern": "^[0-9]+$"
+                }
+              },
+              "required": [
+                "unit_code",
+                "quantity"
+              ]
+            }
           }
         },
         "required": [
@@ -6170,7 +8349,9 @@
           },
           "total_units": {
             "type": "string",
-            "pattern": "^[0-9]+$"
+            "pattern": "^[0-9]+$",
+            "deprecated": true,
+            "description": "Legacy raw mixed-quantity compatibility field only; use quantity_by_unit. Not a meaningful mixed-unit business total."
           },
           "low_stock_products": {
             "type": "integer",
@@ -6201,7 +8382,39 @@
             }
           },
           "activity": {
-            "$ref": "#/components/schemas/StockActivity"
+            "$ref": "#/components/schemas/StockActivity",
+            "deprecated": true,
+            "description": "Legacy gross ledger activity only. The UI uses unit-aware operational analytics with opening/adjustment exclusions and reversal-time offsets."
+          },
+          "quantity_by_unit": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "unit_code": {
+                  "type": "string",
+                  "enum": [
+                    "unspecified",
+                    "piece",
+                    "box",
+                    "kg",
+                    "litre",
+                    "metre",
+                    "pair",
+                    "set"
+                  ]
+                },
+                "quantity": {
+                  "type": "string",
+                  "pattern": "^[0-9]+$"
+                }
+              },
+              "required": [
+                "unit_code",
+                "quantity"
+              ]
+            }
           }
         },
         "required": [
@@ -6278,6 +8491,211 @@
           "items",
           "reference_value"
         ]
+      },
+      "StockCountLine": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "count_id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "product_id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "sku_snapshot": {
+            "type": "string",
+            "pattern": "^[A-Z0-9._-]{1,64}$"
+          },
+          "product_name_snapshot": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "unit_code": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "piece",
+              "box",
+              "kg",
+              "litre",
+              "metre",
+              "pair",
+              "set"
+            ]
+          },
+          "expected_quantity": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "counted_quantity": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
+          },
+          "adjustment_transaction_id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647,
+            "nullable": true
+          },
+          "discrepancy": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "count_id",
+          "product_id",
+          "sku_snapshot",
+          "product_name_snapshot",
+          "unit_code",
+          "expected_quantity",
+          "expected_revision",
+          "counted_quantity",
+          "reason",
+          "adjustment_transaction_id",
+          "discrepancy"
+        ]
+      },
+      "StockCount": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "count_id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "created_by": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "approved_by": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647,
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "submitted",
+              "approved",
+              "cancelled"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$",
+            "example": "2026-10-11T01:02:03.123456Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$",
+            "example": "2026-10-11T01:02:03.123456Z"
+          },
+          "approved_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$",
+            "example": "2026-10-11T01:02:03.123456Z",
+            "nullable": true
+          },
+          "lines": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/StockCountLine"
+            }
+          }
+        },
+        "required": [
+          "count_id",
+          "created_by",
+          "approved_by",
+          "status",
+          "version",
+          "note",
+          "created_at",
+          "updated_at",
+          "approved_at"
+        ]
+      },
+      "CountLineWrite": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "expected_stock_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "counted_quantity": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
+          },
+          "recount": {
+            "type": "boolean",
+            "description": "Optional additive presence flag. Legacy immutable product-create replays retain their original payload; missing means no image information."
+          }
+        },
+        "required": [
+          "expected_version",
+          "counted_quantity"
+        ]
+      },
+      "CountVersion": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          }
+        },
+        "required": [
+          "expected_version"
+        ]
       }
     },
     "parameters": {
@@ -6340,7 +8758,8 @@
           "type": "string",
           "enum": [
             "json",
-            "csv"
+            "csv",
+            "detailed_json"
           ],
           "default": "json"
         }
@@ -6541,7 +8960,7 @@
         }
       },
       "Error409": {
-        "description": "DUPLICATE_CATEGORY, REFERENCED_RECORD, DUPLICATE_SKU, STALE_EDIT, SKU_IMMUTABLE, ARCHIVE_CONFLICT, PRODUCT_ARCHIVED, IDEMPOTENCY_CONFLICT, OPERATION_INCOMPLETE, REVERSAL_CONFLICT, INSUFFICIENT_STOCK, STOCK_OVERFLOW, VERSION_OVERFLOW; DUPLICATE_USERNAME, LAST_ADMIN (serialized final-Admin protection)",
+        "description": "DUPLICATE_CATEGORY, REFERENCED_RECORD, DUPLICATE_SKU, STALE_EDIT, COUNT_STALE, COUNT_STATE, UNIT_IMMUTABLE, SKU_IMMUTABLE, ARCHIVE_CONFLICT, PRODUCT_ARCHIVED, IDEMPOTENCY_CONFLICT, OPERATION_INCOMPLETE, REVERSAL_CONFLICT, INSUFFICIENT_STOCK, STOCK_OVERFLOW, VERSION_OVERFLOW; DUPLICATE_USERNAME, LAST_ADMIN (serialized final-Admin protection)",
         "headers": {
           "X-Request-ID": {
             "schema": {

@@ -1,5 +1,7 @@
 ﻿# Database compatibility before Stage 4
 
+2026-11-14 audit Phases 3–5: actual MariaDB 10.4.32 fresh/004→005/005→006/006→007 upgrade, rerun/preservation, strict grouping/constraints, edit conflicts, unit/reversal analytics and count race/rollback checks pass. Seven migrations/twelve tables are available after an operator upgrade; installed remains four/ten. New SQL retains shared collations, explicit CHECK/FK clauses and no quantity trigger. Strict GROUP BY/aggregate alias differences were handled with derived queries, without weakening sql_mode. MySQL 8.4 execution remains NOT VERIFIED. [Actual results and upgrade](phase345-upgrade.md).
+
 The compatibility interlude supports XAMPP **MariaDB 10.4.32 for local development only**. Connection/capability probes and subsequent Stage 4 schema/migration/bootstrap/seed/reconciliation tests passed independently. MySQL 8.4 remains the production target; actual MySQL connection and acceptance are **pending**. Stages 6–12 now independently verify local authentication, permissions, atomic stock/opening/reversal/races, snapshots and CSV exports. See [schema](schema.md) and [Stage 4 results](stage4-results.json).
 
 | Target | Policy | Actual evidence |

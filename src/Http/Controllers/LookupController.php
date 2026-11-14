@@ -13,10 +13,11 @@ final readonly class LookupController
     {
         $actor=$this->auth->current();
         Authorization::requireRole($actor,$method==='GET'?($resource==='categories'?['Admin','Staff','Viewer']:['Admin','Staff']):['Admin']);
-        $query=ApiInput::query(explode('?',$uri,2)[1]??'',$method==='GET'?['q','page','per_page','sort','direction']:[]);
+        $query=ApiInput::query(explode('?',$uri,2)[1]??'',$method==='GET'?['q','page','per_page','sort','direction','include_products','include_edit_version']:[]);
+        if(isset($query['include_edit_version'])){$query['include_edit_version']=ApiInput::boolean($query['include_edit_version'],'include_edit_version');if($query['include_edit_version'])Authorization::requireRole($actor,['Admin']);}
         if($method==='GET') { $result=$this->service->listing($resource,$query); return Response::success($result['data'],$result['meta']); }
         $this->sessions->verifyCsrf();
-        $body=$method==='DELETE' && (int)($_SERVER['CONTENT_LENGTH']??0)===0?[]:ApiInput::body($method==='DELETE'?[]:LookupService::fields($resource));
+        $body=$method==='DELETE' && (int)($_SERVER['CONTENT_LENGTH']??0)===0?[]:ApiInput::body($method==='DELETE'?['expected_edit_version']:[...LookupService::fields($resource),'expected_edit_version']);
         return Response::success($this->service->mutate($resource,$method,$id,$body,$actor,$requestId),[],$method==='POST'?201:200);
     }
     public function page(string $resource): Response

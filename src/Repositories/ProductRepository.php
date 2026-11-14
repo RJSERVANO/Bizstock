@@ -30,11 +30,12 @@ final readonly class ProductRepository
         return ['data'=>$q->fetchAll(),'meta'=>['page'=>$page['page'],'per_page'=>$page['per_page'],'total'=>$total,'total_pages'=>(int)ceil($total/$page['per_page'])]];
     }
     public function create(array $data): int
-    { $columns=['sku','product_name','category_id','supplier_id','price','minimum_threshold','location','description'];$q=$this->pdo->prepare('INSERT INTO products('.implode(',',$columns).') VALUES ('.implode(',',array_fill(0,count($columns),'?')).')');$q->execute(array_map(fn($key)=>$data[$key],$columns));return (int)$this->pdo->lastInsertId(); }
+    { $columns=['sku','product_name','category_id','supplier_id','price','minimum_threshold','location','description'];if(array_key_exists('unit_code',$data))$columns[]='unit_code';$q=$this->pdo->prepare('INSERT INTO products('.implode(',',$columns).') VALUES ('.implode(',',array_fill(0,count($columns),'?')).')');$q->execute(array_map(fn($key)=>$data[$key],$columns));return (int)$this->pdo->lastInsertId(); }
     public function update(int $id,array $data): void
     {
-        if(array_diff(array_keys($data),['sku','product_name','category_id','supplier_id','price','minimum_threshold','location','description','is_active'])){throw new \LogicException('Untrusted metadata columns.');}
-        $q=$this->pdo->prepare('UPDATE products SET '.implode(',',array_map(fn($key)=>$key.'=?',array_keys($data))).',version=version+1,updated_at=UTC_TIMESTAMP(6) WHERE product_id=?');$q->execute([...array_values($data),$id]);
+        if(array_diff(array_keys($data),['sku','product_name','category_id','supplier_id','price','minimum_threshold','location','description','is_active','unit_code'])){throw new \LogicException('Untrusted metadata columns.');}
+        $revision=isset($data['is_active'])||isset($data['unit_code'])?',stock_revision=stock_revision+1':'';
+        $q=$this->pdo->prepare('UPDATE products SET '.implode(',',array_map(fn($key)=>$key.'=?',array_keys($data))).$revision.',version=version+1,updated_at=UTC_TIMESTAMP(6) WHERE product_id=?');$q->execute([...array_values($data),$id]);
     }
     public function hasMovements(int $id): bool
     { $q=$this->pdo->prepare('SELECT transaction_id FROM transactions WHERE product_id=? LIMIT 1');$q->execute([$id]);return (bool)$q->fetch(); }

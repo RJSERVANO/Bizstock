@@ -1,5 +1,7 @@
 # Deployment preparation — Stage 15, no deployment
 
+Local audit Phases 3–5 require the separately reviewed [upgrade/backup/forward-rollback runbook](phase345-upgrade.md). No installed migration or deployment was performed. After upgrade, runtime additionally needs INSERT/UPDATE on stock_counts and stock_count_lines (schema SELECT/locking-read privileges retained). Do not grant history UPDATE/DELETE or audit DELETE. The disposable native restore/grants rehearsal includes populated counts and a restricted count workflow. Old writers are not a safe post-upgrade write rollback because they do not advance stock_revision; retain the compatible writer even when disabling new screens.
+
 Local preparation is verified on MariaDB 10.4.32 only. **Not deploy-ready:** MySQL 8.4 execution, production HTTPS, actual participant testing and hosting/credentials remain pending. MariaDB 10.4.32 is local development only and rejected in production. Stage 16 has not started. No services were purchased or published.
 
 ## Missing external prerequisites

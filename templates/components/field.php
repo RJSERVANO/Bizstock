@@ -6,7 +6,7 @@ $type = in_array($type ?? 'text', ['text', 'password', 'number', 'search', 'emai
 <div class="field">
 <label for="<?= Ui::escape($id) ?>"><?= Ui::escape($label) ?><?= !empty($required) ? ' <span class="required-label">(required)</span>' : '' ?></label>
 <?php if ($type === 'select'): ?>
-<select class="form-select" id="<?= Ui::escape($id) ?>" name="<?= Ui::escape($id) ?>" <?= !empty($required) ? 'required' : '' ?> aria-describedby="<?= Ui::escape($id) ?>-hint <?= Ui::escape($id) ?>-error">
+<select class="form-select" id="<?= Ui::escape($id) ?>" name="<?= Ui::escape($inputName??$id) ?>" <?= !empty($required) ? 'required' : '' ?> aria-describedby="<?= Ui::escape($id) ?>-hint <?= Ui::escape($id) ?>-error">
 <?php foreach ($options as $key => $option): ?><option value="<?= Ui::escape($key) ?>" <?= (string) ($value ?? '') === (string) $key ? 'selected' : '' ?>><?= Ui::escape($option) ?></option><?php endforeach; ?>
 </select>
 <?php elseif ($type === 'textarea'): ?>

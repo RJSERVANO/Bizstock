@@ -17,14 +17,16 @@ final readonly class UserService
   if($create)$d['password_hash']=self::hash($body['password']??null);if(!$d)throw new HttpException(422,'VALIDATION_ERROR','Provide account changes.');return $d;
  }
  public function write(string $method,?int $id,array $body,array $actor,string $requestId,bool $reset=false):array{
+  $expected=array_key_exists('expected_edit_version',$body)?ApiInput::integer($body['expected_edit_version'],'expected_edit_version',1):null;unset($body['expected_edit_version']);
   if($reset){if(array_keys($body)!==['new_password'])throw new HttpException(422,'VALIDATION_ERROR','Supply only new_password.');$d=['password_hash'=>self::hash($body['new_password']),'must_change_password'=>1];}
   elseif($method==='DELETE'){if($body)throw new HttpException(422,'VALIDATION_ERROR','Deactivate accepts an empty object.');$d=['is_active'=>0];}
   else $d=self::fields($body,$method==='POST');
-  try{return AtomicWrite::run($this->pdo,$actor,['Admin'],function($current)use($method,$id,$d,$requestId,$reset){
+  try{return AtomicWrite::run($this->pdo,$actor,['Admin'],function($current)use($method,$id,$d,$requestId,$reset,$expected){
    $repo=new UserRepository($this->pdo);$auth=new AuthRepository($this->pdo);$before=null;
    if($method==='POST'&&!$reset){$id=$repo->create($d);$action='user.created';}
    else{$row=$auth->byId($id,true);if(!$row)throw new HttpException(404,'NOT_FOUND','Account not found.');if($row['session_version']>=2147483647)throw new HttpException(409,'VERSION_OVERFLOW','Account version limit exceeded.');
     if($row['is_active']&&$row['role']==='Admin'&&(($d['role']??'Admin')!=='Admin'||($d['is_active']??1)===0)&&$repo->activeAdmins()<=1)throw new HttpException(409,'LAST_ADMIN','Keep at least one active Admin.');
+    if($expected!==null&&$expected!==(int)$row['edit_version'])throw new HttpException(409,'STALE_EDIT','This account changed. Your entries are retained; reload and review before saving.');if($row['edit_version']>=2147483647)throw new HttpException(409,'VERSION_OVERFLOW','Edit revision limit reached.');
     $before=Authorization::user($row);$repo->update($id,$d);$action=$reset?'user.password_reset':($method==='DELETE'?'user.deactivated':'user.updated');
    }
    $after=Authorization::user($auth->byId($id));(new AuditRepository($this->pdo))->record((int)$current['user_id'],$action,'user',$id,$before,$after,$requestId);return $after;

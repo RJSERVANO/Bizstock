@@ -1,0 +1,3 @@
+ALTER TABLE products ADD COLUMN unit_code VARCHAR(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'unspecified', ADD COLUMN stock_revision INT NOT NULL DEFAULT 1, ADD CONSTRAINT ck_products_unit CHECK(unit_code IN ('unspecified','piece','box','kg','litre','metre','pair','set')), ADD CONSTRAINT ck_products_stock_revision CHECK(stock_revision>0);
+ALTER TABLE transactions ADD COLUMN unit_code VARCHAR(16) CHARACTER SET ascii COLLATE ascii_bin NULL, ADD CONSTRAINT ck_transactions_unit CHECK(unit_code IS NULL OR unit_code IN ('unspecified','piece','box','kg','litre','metre','pair','set'));
+CREATE INDEX idx_products_unit_active ON products(unit_code,is_active,product_id);

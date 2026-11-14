@@ -17,7 +17,7 @@ final readonly class OperationRepository
         }
         $query=$this->pdo->prepare('INSERT INTO operation_requests(actor_id,operation_kind,request_key,payload_hash) VALUES (?,?,?,?)');$query->execute([$actor,$kind,$key,$hash]);return null;
     }
-    public function complete(int $actor,string $key,int $product,?int $movement,array $result): array
+    public function complete(int $actor,string $key,?int $product,?int $movement,array $result): array
     {
         $query=$this->pdo->prepare('UPDATE operation_requests SET product_id=?,transaction_id=?,response_status=201,response_json=? WHERE actor_id=? AND request_key=?');
         $encoded=CanonicalJson::encode($result);$query->execute([$product,$movement,$encoded,$actor,$key]);return json_decode($encoded,true,32,JSON_THROW_ON_ERROR);

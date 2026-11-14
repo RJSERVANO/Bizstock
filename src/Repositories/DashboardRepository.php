@@ -7,7 +7,7 @@ final readonly class DashboardRepository
  public function counts(): array
  {
   $r=$this->pdo->query('SELECT COUNT(*) AS active_products,CAST(COALESCE(SUM(CAST(quantity AS DECIMAL(30,0))),0) AS CHAR) AS total_units,COALESCE(SUM(CASE WHEN quantity<=minimum_threshold THEN 1 ELSE 0 END),0) AS low_stock_products FROM products WHERE is_active=1')->fetch();
-  return ['active_products'=>(int)$r['active_products'],'total_units'=>$r['total_units'],'low_stock_products'=>(int)$r['low_stock_products'],'out_of_stock_products'=>(int)$this->pdo->query('SELECT COUNT(*) FROM products WHERE is_active=1 AND quantity=0')->fetchColumn()];
+  return ['active_products'=>(int)$r['active_products'],'total_units'=>$r['total_units'],'low_stock_products'=>(int)$r['low_stock_products'],'quantity_by_unit'=>(new AnalyticsRepository($this->pdo))->quantitiesByUnit(),'out_of_stock_products'=>(int)$this->pdo->query('SELECT COUNT(*) FROM products WHERE is_active=1 AND quantity=0')->fetchColumn()];
  }
 
  /** Indexed UTC range; Manila has a fixed +08:00 offset throughout the supported reporting range. */

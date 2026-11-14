@@ -1,0 +1,303 @@
+{
+  "date": "2026-11-14",
+  "scope": "Authorized installed local Phase 3-5 upgrade; no Phase 6",
+  "documentation_rules": {
+    "file": "AGENTS.md",
+    "index": "docs/README.md",
+    "all_formats": true,
+    "broad_reorganization": false
+  },
+  "target": {
+    "database": "bizstock_local",
+    "host": "127.0.0.1",
+    "port": 13307,
+    "php": "8.5.11",
+    "version": "10.4.32-MariaDB",
+    "db_target": "mariadb104-local"
+  },
+  "final_status": "Completed: seven migrations applied, preservation passed with owner-confirmed sign-in activity retained, final application restart and repeated read-only smoke/CLI checks passed.",
+  "private_backup": {
+    "location": "C:\\Users\\reina\\Bizstock\\var\\backups\\installed-phase345-20261114-154414",
+    "acl_inheritance_disabled": true,
+    "payload_files": 18,
+    "payload_bytes": 151626,
+    "original_manifest_sha256_and_all_payload_hashes_and_sizes_verified": true,
+    "protected_files": 16,
+    "upload_tree_files_including_support_files": 4,
+    "native_empty_target_restore": true,
+    "original_tables_integrity": 10,
+    "restored_tables_integrity": 10,
+    "upgraded_restore_tables_integrity": 12,
+    "protected_file_restore_hashes_verified": 16,
+    "rehearsal_databases_retained_for_diagnosis": false,
+    "rehearsal_databases_cleaned_after_successful_continuation": true
+  },
+  "before_migration": {
+    "applied": [
+      "001_domain.sql",
+      "002_support.sql",
+      "003_access_indexes.sql",
+      "004_private_images.sql"
+    ],
+    "pending": [
+      "005_edit_and_movement_context.sql",
+      "006_integer_units.sql",
+      "007_physical_counts.sql"
+    ],
+    "ddl_matches_fresh_004": true,
+    "quiescence": {
+      "other_client_connections": 0,
+      "enabled_database_events": 0
+    },
+    "scheduled_tasks_inspected": 208,
+    "matching_scheduled_task_actions": 0,
+    "web_server_stopped_and_8080_listener_absent": true
+  },
+  "migrations": {
+    "runner": "& .\\.tools\\php\\php.exe bin/migrate.php",
+    "applied": [
+      "005_edit_and_movement_context.sql",
+      "006_integer_units.sql",
+      "007_physical_counts.sql"
+    ],
+    "pending_after": [],
+    "applied_total": 7,
+    "tables_total": 12,
+    "source_checksums_sha256": {
+      "001_domain.sql": "da472132623d4433a54d36b748a5913b6488403ac60fb43e48c090ac396dd8ff",
+      "002_support.sql": "e5e793c65d0353733bb95da1f9cd31b242e027f6a17dbecd1d1b2be2e5fa7a1d",
+      "003_access_indexes.sql": "94a41b5c43242662da4de43a10f391e7e81efaef2527b5cfbaed44d6cff1c57b",
+      "004_private_images.sql": "756b0efdb719852eae8d37ee4fdbd83fb9d8d414e5e221afc3833edc0c0ed0c5",
+      "005_edit_and_movement_context.sql": "dd877fa8ebe5437275822f9d118322d68bf327e2a48031d1ef1253e5a8cb8622",
+      "006_integer_units.sql": "62df466f662627dd6b329af733968248c67c1bd9b77103dc4168154ee66741f4",
+      "007_physical_counts.sql": "35f06275e3fcc9967478c0194eb42ae50cc91830d6f62fa2807f15434c9d1641"
+    },
+    "original_applied_rows_and_checksums_preserved": true,
+    "installed_integrity_after": 12
+  },
+  "installed_cli": {
+    "check_schema": {
+      "exit": 0,
+      "ready": true,
+      "pending": []
+    },
+    "check_database": {
+      "exit": 0,
+      "target": "mariadb104-local",
+      "scope": "local-development-only",
+      "timezone": "+00:00"
+    },
+    "reconcile_stock": {
+      "exit": 0,
+      "products_checked": 3,
+      "discrepancies": []
+    }
+  },
+  "pre_restart_preservation": {
+    "all_original_columns_and_records": true,
+    "credentials_and_security_fields": true,
+    "configuration_and_upload_hashes": true,
+    "stock_and_history": true,
+    "full_schema_matches_rehearsal": true,
+    "only_documented_additive_defaults": true,
+    "new_count_tables_empty": true
+  },
+  "restart": {
+    "initial_restart_success": true,
+    "pid": 29692,
+    "bind": "127.0.0.1:8080",
+    "final_server_running": true,
+    "stopped_after_final_comparison_failure": true,
+    "final_8080_listener_absent": false,
+    "final_restart_pid": 21300,
+    "final_8080_listener_verified": true,
+    "temporary_hold_resolved": true
+  },
+  "smoke": {
+    "http_get_checks": [
+      {
+        "path": "/",
+        "status": 200
+      },
+      {
+        "path": "/login",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/health",
+        "status": 200
+      },
+      {
+        "path": "/dashboard",
+        "status": 303
+      },
+      {
+        "path": "/analytics",
+        "status": 303
+      },
+      {
+        "path": "/stock-counts",
+        "status": 303
+      },
+      {
+        "path": "/api/v1/auth/me",
+        "status": 401
+      },
+      {
+        "path": "/api/v1/products",
+        "status": 401
+      },
+      {
+        "path": "/api/v1/analytics",
+        "status": 401
+      },
+      {
+        "path": "/api/v1/stock-counts",
+        "status": 401
+      }
+    ],
+    "browser": {
+      "engine": "Chrome headless",
+      "login_form_visible": true,
+      "layouts": [
+        {
+          "width": 360,
+          "no_horizontal_overflow": true
+        },
+        {
+          "width": 768,
+          "no_horizontal_overflow": true
+        },
+        {
+          "width": 1440,
+          "no_horizontal_overflow": true
+        }
+      ],
+      "private_page_redirect": true,
+      "javascript_errors": 0
+    },
+    "installed_login_attempted": false,
+    "business_mutations_attempted": false,
+    "authenticated_installed_smoke": "Not performed: a new login would change account metadata.",
+    "final_restart_repeat_pass": true
+  },
+  "final_preservation": {
+    "overall_pass": true,
+    "original_table_comparisons": {
+      "audit_events": {
+        "original_rows": 17,
+        "current_original_rows": 17,
+        "original_fields_preserved": true
+      },
+      "categories": {
+        "original_rows": 1,
+        "current_original_rows": 1,
+        "original_fields_preserved": true
+      },
+      "operation_requests": {
+        "original_rows": 3,
+        "current_original_rows": 3,
+        "original_fields_preserved": true
+      },
+      "products": {
+        "original_rows": 3,
+        "current_original_rows": 3,
+        "original_fields_preserved": true
+      },
+      "rate_limits": {
+        "original_rows": 10,
+        "current_original_rows": 10,
+        "original_fields_preserved": false
+      },
+      "schema_migrations": {
+        "original_rows": 4,
+        "current_original_rows": 4,
+        "original_fields_preserved": true
+      },
+      "security_locks": {
+        "original_rows": 1,
+        "current_original_rows": 1,
+        "original_fields_preserved": true
+      },
+      "suppliers": {
+        "original_rows": 1,
+        "current_original_rows": 1,
+        "original_fields_preserved": true
+      },
+      "transactions": {
+        "original_rows": 3,
+        "current_original_rows": 3,
+        "original_fields_preserved": true
+      },
+      "users": {
+        "original_rows": 5,
+        "current_original_rows": 5,
+        "original_fields_preserved": true
+      }
+    },
+    "rate_limit_changed_fields": {
+      "window_started_at": 2,
+      "reset_at": 2,
+      "attempts": 2
+    },
+    "new_successful_login_timestamp_rows": 1,
+    "activity_source": "Owner explicitly confirmed signing in while application was briefly running.",
+    "original_credential_and_security_fields_preserved": true,
+    "protected_files_unchanged": true,
+    "stock": {
+      "products_checked": 3,
+      "discrepancies": []
+    },
+    "existing_application_and_tool_input_files_unchanged": 229,
+    "original_exact_comparison_pass": false,
+    "accepted_exception": "Two rate-limit rows and one new successful-login timestamp; newer owner authentication activity preserved without edits.",
+    "accepted_activity_exactly_matches_preserved_diagnostics": true,
+    "all_other_original_records_fields_and_credentials_preserved": true,
+    "final_integrity_tables": 12
+  },
+  "failure_handling": {
+    "dependent_work_stopped": true,
+    "private_diagnostic_file": "post-smoke-diagnostic-private.json",
+    "separate_current_state_native_dump": "post-smoke-current-database.sql",
+    "current_state_dump_sha256": "bef6b94cb7d55f9097dd5fd840ea0f2338f5c0a447fef4486c0b5e33a6acb4fe",
+    "original_backup_preserved": true,
+    "rehearsal_targets_retained": false,
+    "older_database_restored_over_newer_activity": false,
+    "rate_limit_or_login_data_edited": false,
+    "installed_migration_rerun": false,
+    "continuation": "Owner confirmed sign-in; accepted-activity preservation gate passed, owned rehearsal targets cleaned, application restarted and read-only smoke/CLIs passed again.",
+    "temporary_hold_resolved": true
+  },
+  "separate_tests": {
+    "composer_validate_strict": "PASS",
+    "composer_check": {
+      "status": "PASS",
+      "syntax_files": 153,
+      "foundation": 139,
+      "engine_policy": 14,
+      "api": 64
+    },
+    "phase3": {
+      "status": "PASS",
+      "integration": 40,
+      "chrome": 10
+    },
+    "phase4": {
+      "status": "PASS",
+      "integration": 24,
+      "chrome": 8
+    },
+    "phase5": {
+      "status": "PASS",
+      "integration": 40,
+      "chrome": 17
+    },
+    "mutation_fixtures_targeted_installation": false,
+    "native_isolated_restore_and_rehearsed_upgrade": "PASS"
+  },
+  "limitations": [
+    "Installed authenticated feature smoke not performed by this operation.",
+    "MySQL 8.4 not verified.",
+    "No production, hosted CI, representative-volume, participant or manual assistive-technology verification in this operation."
+  ]
+}

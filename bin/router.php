@@ -34,6 +34,8 @@ try {
         'assets/js/pages/history.js' => 'text/javascript; charset=utf-8',
         'assets/js/pages/dashboard.js' => 'text/javascript; charset=utf-8',
         'assets/js/pages/reports.js' => 'text/javascript; charset=utf-8',
+        'assets/js/pages/stock-counts.js' => 'text/javascript; charset=utf-8',
+        'assets/js/pages/analytics.js' => 'text/javascript; charset=utf-8',
         'assets/js/pages/users.js' => 'text/javascript; charset=utf-8',
         'assets/js/pages/audit-events.js' => 'text/javascript; charset=utf-8',
         'assets/js/pages/auth.js' => 'text/javascript; charset=utf-8',
